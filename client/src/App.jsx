@@ -8,6 +8,11 @@ import './App.css';
 // statusItems 定义了系统状态卡片中要展示的组件和它们的当前状态，保存在前端作为静态数据。
 // 每个对象包含一个 label（组件名称）和一个 value（当前状态）。
 // 后续可以通过 API 获取实际状态并动态更新这些值。 -- important
+/*
+    物理位置：它存在于浏览器的 JS 内存中。
+    生命周期：它会在 JS 文件被加载时初始化一次，并且在整个应用运行期间永远只有一份，即便 App 组件被重新渲染，这个数组也不会被重构。
+    用途：这种写法最适合放不需要改变的常量（Constants）。
+ */
 const statusItems = [
     { label: 'Vector Store', value: 'Milvus' },
     { label: 'Metadata DB', value: 'MongoDB' },
@@ -41,59 +46,45 @@ function App() {
             </header>
 
             <main className="grid">
-                <section className="card">
+                <section className="card card-left">
                     <h3>Upload knowledge</h3>
-                    <p>Drag and drop files or select from local storage.</p>
-                    <div className="input-row">
-                        <input type="text" placeholder="Project name" />
-                        <button type="button">Create bucket</button>
-                    </div>
+                    <p>Upload PDF documents to your vector database.</p>
                     <div className="upload-box">
-                        <span>Drop files here</span>
-                        <button type="button">Choose files</button>
+                        <span>Select PDF files</span>
+                        <button type="button">Browse</button>
                     </div>
-                    <div className="tag-row">
-                        <span className="tag">PDF</span>
-                        <span className="tag">Markdown</span>
-                        <span className="tag">Docx</span>
+                    <div className="file-list">
+                        <div className="file-item">
+                            <span>Ready for ingestion...</span>
+                        </div>
                     </div>
                 </section>
 
-                <section className="card">
+                <section className="card card-right">
                     <h3>Ask the knowledge base</h3>
-                    <p>Send a question to the RAG pipeline and stream answers.</p>
-                    <textarea rows="6" placeholder="Ask anything about your documents..." />
-                    <div className="input-row">
-                        <select>
-                            <option>rerank: on</option>
-                            <option>rerank: off</option>
-                        </select>
-                        <button type="button">Send question</button>
-                    </div>
-                    <div className="response">
-                        <p className="response-label">Latest response</p>
-                        <p>
-                            Ready to connect to the backend. Configure the API URL in
-                            <code> .env</code> when the server is running.
-                        </p>
-                    </div>
-                </section>
+                    <p>Context-aware conversation with your documents.</p>
 
-                <section className="card wide">
-                    <h3>Pipeline activity</h3>
-                    <p>Track ingestion, embeddings, and generation tasks.</p>
-                    <div className="timeline">
-                        <div>
-                            <strong>Ingestion</strong>
-                            <span>Waiting for files</span>
+                    <div className="chat-container">
+                        <div className="chat-msg bot">
+                            <p>Hello! Upload a PDF and ask me anything about it.</p>
                         </div>
-                        <div>
-                            <strong>Embedding</strong>
-                            <span>Queue idle</span>
+                        <div className="rag-citation">
+                            <p className="citation-label">Top 3 RAG Contexts (Reranked)</p>
+                            <div className="token-list">
+                                <span className="token">#chunk_1</span>
+                                <span className="token">#chunk_5</span>
+                                <span className="token">#chunk_2</span>
+                            </div>
                         </div>
-                        <div>
-                            <strong>Generation</strong>
-                            <span>No active sessions</span>
+                    </div>
+
+                    <div className="chat-input-area">
+                        <textarea rows="3" placeholder="Type your question..." />
+                        <div className="input-row">
+                            <label className="switch-label">
+                                <input type="checkbox" defaultChecked /> Rerank
+                            </label>
+                            <button type="button">Send</button>
                         </div>
                     </div>
                 </section>
