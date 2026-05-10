@@ -1,8 +1,5 @@
 // 这个组件和 App.css 配合使用，每一个组件都是一套独立的 {.jsx, .css}
-// App 包含3个主要部分：
-// 1. Hero 区：展示系统简介和状态卡片
-// 2. 主体区：包含上传、问答、活动三个功能卡片
-// 3. 状态卡片：显示 RAG 系统的核心组件状态（向量库、数据库、队列、LLM）
+import { useState } from 'react';
 import './App.css';
 
 // statusItems 定义了系统状态卡片中要展示的组件和它们的当前状态，保存在前端作为静态数据。
@@ -20,7 +17,57 @@ const statusItems = [
     { label: 'LLM', value: 'Cloud API' }
 ];
 
+const apiBaseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+
 function App() {
+    // return [状态值, 更新状态的函数]，通过这个func来改变状态值
+    // params 组件第一次渲染时，useState设定这个状态的默认值
+    const [selectedFile, setSelectedFile] = useState(null);
+    const [uploadStatus, setUploadStatus] = useState('Ready for ingestion...');
+    const [isUploading, setIsUploading] = useState(false);
+
+    // <input>下，文件有变化就触发，onchange
+    const handleFileChange = (event) => {
+        const file = event.target.files?.[0] || null;
+        setSelectedFile(file);
+        setUploadStatus(file ? `Selected: ${file.name}` : 'Ready for ingestion...');
+    };
+
+    // submit点击触发
+    const handleUpload = async () => {
+        if (!selectedFile) {
+            setUploadStatus('Please select a PDF file first.');
+            return;
+        }
+
+        setIsUploading(true);
+        setUploadStatus('Uploading...');
+
+        try {
+            const formData = new FormData();
+            formData.append('file', selectedFile);
+
+            const response = await fetch(`${apiBaseUrl}/api/upload`, {
+                method: 'POST',
+                body: formData
+            });
+
+            const result = await response.json();
+
+            if (!response.ok) {
+                setUploadStatus(result.error || 'Upload failed.');
+                return;
+            }
+
+            setUploadStatus(`Uploaded: ${result.filename}`);
+        } catch (error) {
+            setUploadStatus('Upload failed. Please try again.');
+        } finally { // 无论成功还是失败，最后都要执行的清理工作
+            setIsUploading(false);
+        }
+    };
+
+    // page
     return (
         <div className="app">
             <header className="hero">
@@ -51,12 +98,23 @@ function App() {
                     <p>Upload PDF documents to your vector database.</p>
                     <div className="upload-box">
                         <span>Select PDF files</span>
-                        <button type="button">Browse</button>
+                        <label className="upload-button" htmlFor="pdf-upload">
+                            {selectedFile ? 'Change' : 'Browse'}
+                        </label>
+                        <input
+                            id="pdf-upload"
+                            type="file"
+                            accept="application/pdf"
+                            onChange={handleFileChange}
+                        />
                     </div>
                     <div className="file-list">
                         <div className="file-item">
-                            <span>Ready for ingestion...</span>
+                            <span>{uploadStatus}</span>
                         </div>
+                        <button type="button" onClick={handleUpload} disabled={isUploading}>
+                            {isUploading ? 'Uploading...' : 'Send to backend'}
+                        </button>
                     </div>
                 </section>
 
