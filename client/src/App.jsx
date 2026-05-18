@@ -1,6 +1,7 @@
-// 这个组件和 App.css 配合使用，每一个组件都是一套独立的 {.jsx, .css}
 import { useState } from 'react';
 import './App.css';
+
+// npm run dev
 
 // statusItems 定义了系统状态卡片中要展示的组件和它们的当前状态，保存在前端作为静态数据。
 // 每个对象包含一个 label（组件名称）和一个 value（当前状态）。
@@ -25,6 +26,11 @@ function App() {
     const [selectedFile, setSelectedFile] = useState(null);
     const [uploadStatus, setUploadStatus] = useState('Ready for ingestion...');
     const [isUploading, setIsUploading] = useState(false);
+    const [question, setQuestion] = useState('');
+    const [answer, setAnswer] = useState('');
+    const [contexts, setContexts] = useState([]);
+    const [isQuerying, setIsQuerying] = useState(false);
+    const [useRerank, setUseRerank] = useState(true);
 
     // <input>下，文件有变化就触发，onchange
     const handleFileChange = (event) => {
@@ -64,6 +70,42 @@ function App() {
             setUploadStatus('Upload failed. Please try again.');
         } finally { // 无论成功还是失败，最后都要执行的清理工作
             setIsUploading(false);
+        }
+    };
+
+    const handleQuery = async () => {
+        if (!question.trim()) {
+            setAnswer('Please enter a question.');
+            return;
+        }
+
+        setIsQuerying(true);
+        setAnswer('Querying...');
+
+        try {
+            const response = await fetch(`${apiBaseUrl}/api/query`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    question,
+                    top_k: 6,
+                    rerank: useRerank
+                })
+            });
+
+            const result = await response.json();
+
+            if (!response.ok) {
+                setAnswer(result.error || 'Query failed.');
+                return;
+            }
+
+            setAnswer(result.answer || 'No answer returned.');
+            setContexts(result.contexts || []);
+        } catch (error) {
+            setAnswer('Query failed. Please try again.');
+        } finally {
+            setIsQuerying(false);
         }
     };
 
@@ -124,25 +166,43 @@ function App() {
 
                     <div className="chat-container">
                         <div className="chat-msg bot">
-                            <p>Hello! Upload a PDF and ask me anything about it.</p>
+                            <p>{answer || 'Hello! Upload a PDF and ask me anything about it.'}</p>
                         </div>
                         <div className="rag-citation">
                             <p className="citation-label">Top 3 RAG Contexts (Reranked)</p>
                             <div className="token-list">
-                                <span className="token">#chunk_1</span>
-                                <span className="token">#chunk_5</span>
-                                <span className="token">#chunk_2</span>
+                                {contexts.length === 0 ? (
+                                    <span className="token">No contexts yet</span>
+                                ) : (
+                                    contexts.slice(0, 3).map((ctx, index) => (
+                                        <span className="token" key={`${ctx.doc_id || 'chunk'}-${index}`}>
+                                            #{ctx.chunk_index ?? index}
+                                        </span>
+                                    ))
+                                )}
                             </div>
                         </div>
                     </div>
 
                     <div className="chat-input-area">
-                        <textarea rows="3" placeholder="Type your question..." />
+                        <textarea
+                            rows="3"
+                            placeholder="Type your question..."
+                            value={question}
+                            onChange={(event) => setQuestion(event.target.value)}
+                        />
                         <div className="input-row">
                             <label className="switch-label">
-                                <input type="checkbox" defaultChecked /> Rerank
+                                <input
+                                    type="checkbox"
+                                    checked={useRerank}
+                                    onChange={(event) => setUseRerank(event.target.checked)}
+                                />
+                                Rerank
                             </label>
-                            <button type="button">Send</button>
+                            <button type="button" onClick={handleQuery} disabled={isQuerying}>
+                                {isQuerying ? 'Asking...' : 'Send'}
+                            </button>
                         </div>
                     </div>
                 </section>
