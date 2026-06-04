@@ -9,6 +9,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"os"
 
 	"github.com/gin-gonic/gin"
 	"rag-server/internal/config"
@@ -16,6 +17,7 @@ import (
 
 // Upload 处理 PDF 文件上传，并转发到云端 CANN ingest 服务
 func Upload(c *gin.Context) {
+
 	// 读取 multipart 表单中的文件
 	file, err := c.FormFile("file")
 	if err != nil {
@@ -73,6 +75,39 @@ func Upload(c *gin.Context) {
 			return
 		}
 	}()
+
+	// -- Save debug: success 20260531
+	// os.MkdirAll("uploads", 0755)
+	// out, err := os.Create("uploads/" + file.Filename)
+	// if err == nil {
+	// 	defer out.Close()
+	// 	io.Copy(out, opened)
+	// 	out.Sync()
+	// }
+	// return
+	// -- End of save debug
+
+	/*
+		[ opened (原始PDF) ] 
+			|
+			v  (io.Copy)
+		[ part (Writer句柄) ]  <-- 标记它是 "file" 字段
+			|
+			v
+		[ multipart.Writer (打包机) ]
+			|
+			v
+		[ pipe.writer (传送带入口) ]  <==== [ 内存管道 ] ====> [ pipe.reader (传送带出口) ]
+																		|
+																		v
+															[ http.Request (发送器) ]
+		
+		multipart.Writer 确实把所有的 Multipart 数据协议格式（包括分隔符 Boundary、
+			字段名 name="file"等）全部写进了 writer 也就是流向了 reader。
+		这导致 reader 吐出来的字节流，本身就是一个完美的、合乎规范的 HTTP POST 请求体 (Request Body)。
+		但是这个请求体是没有 HTTP Headers 的，Headers 需要我们在 http.Request 里手动设置，
+			特别是 Content-Type，要和 multipart.Writer 的 FormDataContentType() 保持一致。
+	*/
 
 	// 构建转发请求
 	request, err := http.NewRequestWithContext(ctx, http.MethodPost, ingestURL, reader)
