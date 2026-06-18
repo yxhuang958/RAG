@@ -16,11 +16,20 @@ func Setup() *gin.Engine {
 	// 健康检查
 	router.GET("/health", handlers.Health)
 
-	// 文件上传
-	router.POST("/api/upload", handlers.Upload)
+	router.POST("/api/login", handlers.Login)
 
-	// 问答检索
-	router.POST("/api/query", handlers.Query)
+	api := router.Group("/api")
+	api.Use(middleware.AuthRequired())
+	{
+		// 文件上传
+		api.POST("/upload", handlers.Upload)
+
+		// 问答检索
+		api.POST("/query", handlers.Query)
+
+		// 会话历史
+		api.GET("/sessions", handlers.Sessions)
+	}
 
 	return router
 }

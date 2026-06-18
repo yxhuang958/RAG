@@ -9,14 +9,18 @@ import (
 	"strconv"
 	"strings"
 	"time"
-	"os"
 
 	"github.com/gin-gonic/gin"
 	"rag-server/internal/config"
 )
 
-// Upload 处理 PDF 文件上传，并转发到云端 CANN ingest 服务
+// Upload 处理 PDF 文件上传，并转发到云端 ingest 服务
 func Upload(c *gin.Context) {
+	user, ok := CurrentUser(c)
+	if !ok {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+		return
+	}
 
 	// 读取 multipart 表单中的文件
 	file, err := c.FormFile("file")
@@ -39,15 +43,12 @@ func Upload(c *gin.Context) {
 	}
 	defer opened.Close()
 
-	// 云端 CANN ingest 接口地址
-	ingestURL := config.GetEnv("CANN_INGEST_URL", "")
-	if ingestURL == "" {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "CANN_INGEST_URL not configured"})
-		return
-	}
+	// 云端 Pipeline ingest 接口地址
+	pipelineURL := config.GetEnv("PIPELINE_URL", "http://localhost:9000")
+	ingestURL := pipelineURL + "/ingest"
 
 	// 云端调用超时设置
-	defaultTimeout := config.GetEnv("CANN_INGEST_TIMEOUT_SECONDS", "120")
+	defaultTimeout := config.GetEnv("PIPELINE_TIMEOUT", "60")
 	timeoutSeconds, err := strconv.Atoi(defaultTimeout)
 	if err != nil || timeoutSeconds <= 0 {
 		timeoutSeconds = 120
@@ -63,6 +64,9 @@ func Upload(c *gin.Context) {
 	go func() {
 		defer writer.Close()
 		defer multipartWriter.Close()
+
+		// 写入用户 ID 字段
+		_ = multipartWriter.WriteField("user_id", user.UserID)
 
 		part, err := multipartWriter.CreateFormFile("file", file.Filename) // 创建 multipart 文件字段，用于server端接收识别
 		if err != nil {
@@ -88,7 +92,7 @@ func Upload(c *gin.Context) {
 	// -- End of save debug
 
 	/*
-		[ opened (原始PDF) ] 
+		[ opened (原始PDF) ]
 			|
 			v  (io.Copy)
 		[ part (Writer句柄) ]  <-- 标记它是 "file" 字段
@@ -101,7 +105,7 @@ func Upload(c *gin.Context) {
 																		|
 																		v
 															[ http.Request (发送器) ]
-		
+
 		multipart.Writer 确实把所有的 Multipart 数据协议格式（包括分隔符 Boundary、
 			字段名 name="file"等）全部写进了 writer 也就是流向了 reader。
 		这导致 reader 吐出来的字节流，本身就是一个完美的、合乎规范的 HTTP POST 请求体 (Request Body)。
@@ -118,10 +122,10 @@ func Upload(c *gin.Context) {
 	request.Header.Set("Content-Type", multipartWriter.FormDataContentType())
 
 	// 可选鉴权头
-	apiKey := config.GetEnv("CANN_API_KEY", "")
+	apiKey := config.GetEnv("PIPELINE_API_KEY", "")
 	if apiKey != "" {
-		header := config.GetEnv("CANN_API_KEY_HEADER", "Authorization")
-		prefix := config.GetEnv("CANN_API_KEY_PREFIX", "Bearer ")
+		header := config.GetEnv("PIPELINE_API_KEY_HEADER", "Authorization")
+		prefix := config.GetEnv("PIPELINE_API_KEY_PREFIX", "Bearer ")
 		request.Header.Set(header, prefix+apiKey)
 	}
 
@@ -161,5 +165,5 @@ func Upload(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, payload)  // 直接将云端返回的 JSON payload 转发给前端, const result = await response.json();
+	c.JSON(http.StatusOK, payload) // 直接将云端返回的 JSON payload 转发给前端, const result = await response.json();
 }

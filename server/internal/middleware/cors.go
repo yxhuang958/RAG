@@ -12,7 +12,7 @@ func CORS() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		c.Writer.Header().Set("Access-Control-Allow-Origin", "*") // 通配符（所有源都可以）
 		c.Writer.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
-		c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+		c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
 
 		if c.Request.Method == http.MethodOptions {
 			c.AbortWithStatus(http.StatusNoContent) // 204 No Content, 表示预检请求成功但没有内容返回

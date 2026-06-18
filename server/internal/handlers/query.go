@@ -1,7 +1,10 @@
 package handlers
 
 import (
+	"bytes"
 	"context"
+	"crypto/rand"
+	"encoding/hex"
 	"encoding/json"
 	"io"
 	"net/http"
@@ -13,30 +16,62 @@ import (
 	"rag-server/internal/config"
 )
 
-// Query 转发检索+问答请求到云端 CANN 服务
+type queryRequest struct {
+	Question  string `json:"question"`
+	TopK      int    `json:"top_k"`
+	Rerank    bool   `json:"rerank"`
+	SessionID string `json:"session_id"`
+}
+
+type pipelineQueryRequest struct {
+	Messages any `json:"messages"`
+	TopK     int `json:"top_k"`
+}
+
+// Query 转发检索+问答请求到云端 Pipeline 服务
 func Query(c *gin.Context) {
+	user, ok := CurrentUser(c)
+	if !ok {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+		return
+	}
+
+	var queryPayload queryRequest
+	if err := c.ShouldBindJSON(&queryPayload); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid query payload"})
+		return
+	}
+	queryPayload.Question = strings.TrimSpace(queryPayload.Question)
+	if queryPayload.Question == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "question is required"})
+		return
+	}
+	if queryPayload.TopK <= 0 {
+		queryPayload.TopK = 6
+	}
+	if strings.TrimSpace(queryPayload.SessionID) == "" {
+		queryPayload.SessionID = newSessionID()
+	} else if err := chatStore.LoadUser(user.UserID); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to load chat history"})
+		return
+	}
+
 	// 1. 从环境变量获取云端查询服务的 URL
-	queryURL := config.GetEnv("CANN_QUERY_URL", "")
-	if queryURL == "" {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "CANN_QUERY_URL not configured"})
-		return
-	}
+	pipelineURL := config.GetEnv("PIPELINE_URL", "http://localhost:9000")
+	queryURL := pipelineURL + "/query"
 
-	// 2. 读取前端发送过来的请求体 (包含问题 question 等)
-	body, err := io.ReadAll(c.Request.Body)
+	// 2. 会话历史在业务后端完成隔离，Pipeline 只接收文本上下文
+	pipelineBody, err := json.Marshal(pipelineQueryRequest{
+		Messages: chatStore.PipelineMessages(user.UserID, queryPayload.SessionID, queryPayload.Question),
+		TopK:     queryPayload.TopK,
+	})
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "failed to read request"})
-		return
-	}
-
-	// 校验请求体是否为空
-	if len(strings.TrimSpace(string(body))) == 0 {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "empty request body"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to build query payload"})
 		return
 	}
 
 	// 3. 配置超时时间，防止云端服务响应过慢导致阻塞
-	defaultTimeout := config.GetEnv("CANN_QUERY_TIMEOUT_SECONDS", "60")
+	defaultTimeout := config.GetEnv("PIPELINE_TIMEOUT", "60")
 	timeoutSeconds, err := strconv.Atoi(defaultTimeout)
 	if err != nil || timeoutSeconds <= 0 {
 		timeoutSeconds = 60
@@ -46,7 +81,7 @@ func Query(c *gin.Context) {
 	defer cancel()
 
 	// 4. 构造转发给云端服务的 POST 请求
-	request, err := http.NewRequestWithContext(ctx, http.MethodPost, queryURL, strings.NewReader(string(body)))
+	request, err := http.NewRequestWithContext(ctx, http.MethodPost, queryURL, bytes.NewReader(pipelineBody))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to create query request"})
 		return
@@ -54,10 +89,10 @@ func Query(c *gin.Context) {
 	request.Header.Set("Content-Type", "application/json")
 
 	// 5. 如果配置了 API Key，则添加到请求头进行鉴权
-	apiKey := config.GetEnv("CANN_API_KEY", "")
+	apiKey := config.GetEnv("PIPELINE_API_KEY", "")
 	if apiKey != "" {
-		header := config.GetEnv("CANN_API_KEY_HEADER", "Authorization")
-		prefix := config.GetEnv("CANN_API_KEY_PREFIX", "Bearer ")
+		header := config.GetEnv("PIPELINE_API_KEY_HEADER", "Authorization")
+		prefix := config.GetEnv("PIPELINE_API_KEY_PREFIX", "Bearer ")
 		request.Header.Set(header, prefix+apiKey)
 	}
 
@@ -92,8 +127,8 @@ func Query(c *gin.Context) {
 	}
 
 	// 8. 将响应结果解析为 JSON 并返回给前端
-	var payload map[string]any
-	if err := json.Unmarshal(respBody, &payload); err != nil {
+	var responsePayload map[string]any
+	if err := json.Unmarshal(respBody, &responsePayload); err != nil {
 		c.JSON(http.StatusBadGateway, gin.H{
 			"error":   "invalid query response",
 			"details": strings.TrimSpace(string(respBody)),
@@ -101,5 +136,22 @@ func Query(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, payload)
+	answer, _ := responsePayload["answer"].(string)
+	if _, err := chatStore.AppendExchange(user.UserID, queryPayload.SessionID, queryPayload.Question, answer); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to save chat history"})
+		return
+	}
+
+	responsePayload["session_id"] = queryPayload.SessionID
+	responsePayload["history"] = chatStore.PipelineHistory(user.UserID, queryPayload.SessionID)
+
+	c.JSON(http.StatusOK, responsePayload)
+}
+
+func newSessionID() string {
+	bytes := make([]byte, 8)
+	if _, err := rand.Read(bytes); err != nil {
+		return "session_" + strconv.FormatInt(time.Now().UnixNano(), 36)
+	}
+	return "session_" + hex.EncodeToString(bytes)
 }
