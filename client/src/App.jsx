@@ -1,46 +1,111 @@
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import './App.css';
 
-// npm run dev
-
-// statusItems 定义了系统状态卡片中要展示的组件和它们的当前状态，保存在前端作为静态数据。
-// 每个对象包含一个 label（组件名称）和一个 value（当前状态）。
-// 后续可以通过 API 获取实际状态并动态更新这些值。 -- important
-/*
-    物理位置：它存在于浏览器的 JS 内存中。
-    生命周期：它会在 JS 文件被加载时初始化一次，并且在整个应用运行期间永远只有一份，即便 App 组件被重新渲染，这个数组也不会被重构。
-    用途：这种写法最适合放不需要改变的常量（Constants）。
- */
 const statusItems = [
+    { label: 'Auth', value: 'JWT' },
+    { label: 'History', value: 'Backend cache' },
     { label: 'Vector Store', value: 'Milvus' },
-    { label: 'Metadata DB', value: 'MongoDB' },
-    { label: 'Queue', value: 'Redis' },
     { label: 'LLM', value: 'Cloud API' }
 ];
 
 const apiBaseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
 function App() {
-    // return [状态值, 更新状态的函数]，通过这个func来改变状态值
-    // params 组件第一次渲染时，useState设定这个状态的默认值
+    const [username, setUsername] = useState('demo');
+    const [password, setPassword] = useState('demo');
+    const [token, setToken] = useState(() => localStorage.getItem('rag_token') || '');
+    const [userId, setUserId] = useState(() => localStorage.getItem('rag_user_id') || '');
+    const [loginStatus, setLoginStatus] = useState(token ? 'Signed in' : 'Please sign in');
+    const [sessions, setSessions] = useState([]);
+    const [sessionId, setSessionId] = useState(() => localStorage.getItem('rag_session_id') || '');
     const [selectedFile, setSelectedFile] = useState(null);
     const [uploadStatus, setUploadStatus] = useState('Ready for ingestion...');
     const [isUploading, setIsUploading] = useState(false);
     const [question, setQuestion] = useState('');
     const [answer, setAnswer] = useState('');
     const [contexts, setContexts] = useState([]);
+    const [history, setHistory] = useState([]);
     const [isQuerying, setIsQuerying] = useState(false);
     const [useRerank, setUseRerank] = useState(true);
 
-    // <input>下，文件有变化就触发，onchange
+    const authHeaders = useMemo(() => ({
+        Authorization: `Bearer ${token}`
+    }), [token]);
+
+    useEffect(() => {
+        if (!token) return;
+        refreshSessions();
+    }, [token]);
+
+    const handleLogin = async () => {
+        setLoginStatus('Signing in...');
+
+        try {
+            const response = await fetch(`${apiBaseUrl}/api/login`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
+            });
+            const result = await response.json();
+
+            if (!response.ok) {
+                setLoginStatus(result.error || 'Login failed.');
+                return;
+            }
+
+            setToken(result.token);
+            setUserId(result.user_id);
+            localStorage.setItem('rag_token', result.token);
+            localStorage.setItem('rag_user_id', result.user_id);
+            setSessions(result.sessions || []);
+            setLoginStatus(`Signed in as ${result.user_id}`);
+        } catch (error) {
+            setLoginStatus('Login failed. Please try again.');
+        }
+    };
+
+    const handleLogout = () => {
+        setToken('');
+        setUserId('');
+        setSessions([]);
+        setSessionId('');
+        setHistory([]);
+        setAnswer('');
+        localStorage.removeItem('rag_token');
+        localStorage.removeItem('rag_user_id');
+        localStorage.removeItem('rag_session_id');
+        setLoginStatus('Signed out');
+    };
+
+    const refreshSessions = async () => {
+        try {
+            const response = await fetch(`${apiBaseUrl}/api/sessions`, {
+                headers: authHeaders
+            });
+            const result = await response.json();
+            if (response.ok) {
+                setSessions(result.sessions || []);
+                const active = result.sessions?.find((item) => item.session_id === sessionId);
+                if (active) {
+                    setHistory(active.messages || []);
+                }
+            }
+        } catch (error) {
+            setLoginStatus('Could not refresh sessions.');
+        }
+    };
+
     const handleFileChange = (event) => {
         const file = event.target.files?.[0] || null;
         setSelectedFile(file);
         setUploadStatus(file ? `Selected: ${file.name}` : 'Ready for ingestion...');
     };
 
-    // submit点击触发
     const handleUpload = async () => {
+        if (!token) {
+            setUploadStatus('Please sign in first.');
+            return;
+        }
         if (!selectedFile) {
             setUploadStatus('Please select a PDF file first.');
             return;
@@ -55,9 +120,9 @@ function App() {
 
             const response = await fetch(`${apiBaseUrl}/api/upload`, {
                 method: 'POST',
+                headers: authHeaders,
                 body: formData
             });
-
             const result = await response.json();
 
             if (!response.ok) {
@@ -65,15 +130,19 @@ function App() {
                 return;
             }
 
-            setUploadStatus(`Uploaded: ${result.filename}`);
+            setUploadStatus(`Uploaded: ${result.filename || result.doc_id || selectedFile.name}`);
         } catch (error) {
             setUploadStatus('Upload failed. Please try again.');
-        } finally { // 无论成功还是失败，最后都要执行的清理工作
+        } finally {
             setIsUploading(false);
         }
     };
 
     const handleQuery = async () => {
+        if (!token) {
+            setAnswer('Please sign in first.');
+            return;
+        }
         if (!question.trim()) {
             setAnswer('Please enter a question.');
             return;
@@ -85,14 +154,14 @@ function App() {
         try {
             const response = await fetch(`${apiBaseUrl}/api/query`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 'Content-Type': 'application/json', ...authHeaders },
                 body: JSON.stringify({
                     question,
                     top_k: 6,
-                    rerank: useRerank
+                    rerank: useRerank,
+                    session_id: sessionId
                 })
             });
-
             const result = await response.json();
 
             if (!response.ok) {
@@ -100,8 +169,16 @@ function App() {
                 return;
             }
 
+            if (result.session_id) {
+                setSessionId(result.session_id);
+                localStorage.setItem('rag_session_id', result.session_id);
+            }
+
             setAnswer(result.answer || 'No answer returned.');
             setContexts(result.contexts || []);
+            setHistory(result.history || []);
+            setQuestion('');
+            refreshSessions();
         } catch (error) {
             setAnswer('Query failed. Please try again.');
         } finally {
@@ -109,16 +186,30 @@ function App() {
         }
     };
 
-    // page
+    const selectSession = (session) => {
+        setSessionId(session.session_id);
+        localStorage.setItem('rag_session_id', session.session_id);
+        setHistory(session.messages || []);
+        const lastAnswer = [...(session.messages || [])].reverse().find((item) => item.role === 'assistant');
+        setAnswer(lastAnswer?.content || '');
+    };
+
+    const startNewSession = () => {
+        setSessionId('');
+        localStorage.removeItem('rag_session_id');
+        setHistory([]);
+        setAnswer('');
+        setContexts([]);
+    };
+
     return (
         <div className="app">
             <header className="hero">
                 <div>
                     <p className="eyebrow">RAG System</p>
-                    <h1>Retrieve, Reason, Respond.</h1>
+                    <h1>Session-aware RAG Console</h1>
                     <p className="subtitle">
-                        A lightweight front-end for the Go + Python RAG pipeline.
-                        Upload documents, monitor ingestion, and ask questions.
+                        JWT keeps user state at the app layer; the pipeline receives text context and returns an answer.
                     </p>
                 </div>
                 <div className="hero-card">
@@ -136,19 +227,45 @@ function App() {
 
             <main className="grid">
                 <section className="card card-left">
+                    <h3>Account</h3>
+                    <p>{loginStatus}</p>
+                    <div className="login-form">
+                        <input value={username} onChange={(event) => setUsername(event.target.value)} placeholder="Username" />
+                        <input value={password} onChange={(event) => setPassword(event.target.value)} placeholder="Password" type="password" />
+                        <div className="input-row">
+                            <button type="button" onClick={handleLogin}>Sign in</button>
+                            <button type="button" className="ghost-button" onClick={handleLogout}>Sign out</button>
+                        </div>
+                    </div>
+                    <p className="meta-line">{userId || 'No active user'}</p>
+
+                    <div className="section-title">
+                        <h3>Sessions</h3>
+                        <button type="button" className="ghost-button" onClick={startNewSession}>New</button>
+                    </div>
+                    <div className="session-list">
+                        {sessions.length === 0 ? (
+                            <span className="empty-text">No saved sessions</span>
+                        ) : sessions.map((session) => (
+                            <button
+                                type="button"
+                                className={session.session_id === sessionId ? 'session-item active' : 'session-item'}
+                                key={session.session_id}
+                                onClick={() => selectSession(session)}
+                            >
+                                <strong>{session.session_id}</strong>
+                                <span>{session.messages?.length || 0} messages</span>
+                            </button>
+                        ))}
+                    </div>
+
                     <h3>Upload knowledge</h3>
-                    <p>Upload PDF documents to your vector database.</p>
                     <div className="upload-box">
                         <span>Select PDF files</span>
                         <label className="upload-button" htmlFor="pdf-upload">
                             {selectedFile ? 'Change' : 'Browse'}
                         </label>
-                        <input
-                            id="pdf-upload"
-                            type="file"
-                            accept="application/pdf"
-                            onChange={handleFileChange}
-                        />
+                        <input id="pdf-upload" type="file" accept="application/pdf" onChange={handleFileChange} />
                     </div>
                     <div className="file-list">
                         <div className="file-item">
@@ -161,25 +278,33 @@ function App() {
                 </section>
 
                 <section className="card card-right">
-                    <h3>Ask the knowledge base</h3>
-                    <p>Context-aware conversation with your documents.</p>
+                    <div className="section-title">
+                        <div>
+                            <h3>Ask the knowledge base</h3>
+                            <p>{sessionId ? `Session: ${sessionId}` : 'New session will be created on first question.'}</p>
+                        </div>
+                    </div>
 
                     <div className="chat-container">
-                        <div className="chat-msg bot">
-                            <p>{answer || 'Hello! Upload a PDF and ask me anything about it.'}</p>
-                        </div>
+                        {history.length === 0 ? (
+                            <div className="chat-msg bot">
+                                <p>{answer || 'Sign in, upload a PDF, and ask me anything about it.'}</p>
+                            </div>
+                        ) : history.map((message, index) => (
+                            <div className={`chat-msg ${message.role === 'user' ? 'user' : 'bot'}`} key={`${message.created_at}-${index}`}>
+                                <p>{message.content}</p>
+                            </div>
+                        ))}
                         <div className="rag-citation">
-                            <p className="citation-label">Top 3 RAG Contexts (Reranked)</p>
+                            <p className="citation-label">Top 3 RAG Contexts</p>
                             <div className="token-list">
                                 {contexts.length === 0 ? (
                                     <span className="token">No contexts yet</span>
-                                ) : (
-                                    contexts.slice(0, 3).map((ctx, index) => (
-                                        <span className="token" key={`${ctx.doc_id || 'chunk'}-${index}`}>
-                                            #{ctx.chunk_index ?? index}
-                                        </span>
-                                    ))
-                                )}
+                                ) : contexts.slice(0, 3).map((ctx, index) => (
+                                    <span className="token" key={`${ctx.doc_id || 'chunk'}-${index}`}>
+                                        #{ctx.chunk_index ?? index}
+                                    </span>
+                                ))}
                             </div>
                         </div>
                     </div>
