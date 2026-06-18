@@ -3,7 +3,15 @@ RAG System Architecture (React + Go + Python)
 
 ## Local Run
 
-Start the three services in separate terminals:
+Start all three services with one command:
+
+```bash
+./scripts/dev.sh
+```
+
+The script starts the pipeline, Go API, and React dev server, writes logs to `.logs/`, and stops all services when you press `Ctrl+C`.
+
+Or start the three services in separate terminals:
 
 ```bash
 cd client
