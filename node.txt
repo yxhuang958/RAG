@@ -1,8 +1,0 @@
-1. 前端启动
-cd RAG/client
-npm run dev
-
-2. 后端启动
-cd RAG/server
-go run main.go
-

@@ -1,5 +1,32 @@
 # RAG
-RAG System Architecture (Go + Python + MongoDB)
+RAG System Architecture (React + Go + Python)
+
+## Local Run
+
+Start the three services in separate terminals:
+
+```bash
+cd client
+npm run dev
+```
+
+```bash
+cd server
+go run main.go
+```
+
+```bash
+cd pipeline
+uvicorn app.main:app --host 0.0.0.0 --port 9000
+```
+
+The Go API forwards upload/query requests to the Python pipeline through:
+
+```env
+PIPELINE_URL=http://localhost:9000
+```
+
+Keep app-layer env values in `RAG/.env`, and keep pipeline internals such as Milvus, embedding, rerank, and LLM settings in `RAG/pipeline/.env`.
 
 ## Component
 | Component              | Responsibility           |
@@ -37,30 +64,26 @@ RAG System Architecture (Go + Python + MongoDB)
 - Job status
 - Quota / rate limit
 - Dispatch Python RAG Worker
-- `/api/upload` 直接转发 PDF 到云端 CANN 解析服务（服务负责写入 Milvus）
-- `/api/query` 直接转发检索 + 问答请求到云端 CANN 服务
+- `/api/upload` 直接转发 PDF 到 Python pipeline（pipeline 负责写入 Milvus）
+- `/api/query` 组装当前用户会话历史后转发到 Python pipeline
 
-#### Upload + CANN 云端配置
-Go API 会将上传的 PDF 以 multipart 方式发送到云端：
+#### Pipeline 配置
+Go API 会把上传和问答请求转发到独立的 Python RAG pipeline：
 
-- `CANN_INGEST_URL`：云端 CANN 接口地址（必填）
-- `CANN_INGEST_TIMEOUT_SECONDS`：超时时间（默认 `120`）
-- `CANN_API_KEY`：可选鉴权 key
-- `CANN_API_KEY_HEADER`：鉴权 header（默认 `Authorization`）
-- `CANN_API_KEY_PREFIX`：鉴权前缀（默认 `Bearer `）
-
-#### Query + CANN 云端配置
-
-- `CANN_QUERY_URL`：云端检索/问答接口地址（必填）
-- `CANN_QUERY_TIMEOUT_SECONDS`：超时时间（默认 `60`）
-- `CANN_API_KEY` / `CANN_API_KEY_HEADER` / `CANN_API_KEY_PREFIX` 同上
+- `PIPELINE_URL`：Python pipeline 地址（默认 `http://localhost:9000`）
+- `PIPELINE_TIMEOUT`：转发超时时间（默认 `60` 秒）
+- `PIPELINE_API_KEY`：可选鉴权 key
+- `PIPELINE_API_KEY_HEADER`：鉴权 header（默认 `Authorization`）
+- `PIPELINE_API_KEY_PREFIX`：鉴权前缀（默认 `Bearer `）
 
 ---
 
-### External CANN Pipeline
-云端 CANN 的 embedding + Milvus + 检索 + prompt + LLM 的实现独立在项目外：
+### Python RAG Pipeline
+embedding + Milvus + 检索 + prompt + LLM 的实现位于项目内：
 
-- `../cann-rag-pipeline`
+- `pipeline/`
+
+Pipeline 保持无状态：Go API 传入完整 `messages`，最后一条是本轮用户问题；pipeline 返回 LLM answer 和 RAG contexts。
 
 ---
 
