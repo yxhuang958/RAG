@@ -1,0 +1,223 @@
+from __future__ import annotations
+
+import math
+from typing import Any, List, Optional
+import httpx
+
+try:
+    from FlagEmbedding import FlagReranker
+except ImportError:
+    FlagReranker = None
+
+# 新增 Google Cloud 导入
+try:
+    from google.cloud import aiplatform
+except ImportError:
+    aiplatform = None
+
+from .config import get_settings
+
+
+def _tokenize(text: str) -> List[str]:
+    return [token for token in text.lower().split() if token]
+
+
+def _overlap_score(query: str, passage: str) -> float:
+    query_tokens = set(_tokenize(query))
+    if not query_tokens:
+        return 0.0
+    passage_tokens = set(_tokenize(passage))
+    overlap = query_tokens.intersection(passage_tokens)
+    return len(overlap) / math.sqrt(len(query_tokens))
+
+
+class Reranker:
+    _instance: Optional[FlagReranker] = None
+
+    def __init__(self) -> None:
+        settings = get_settings()
+        self.provider = settings.rerank_provider
+        self.endpoint = settings.rerank_endpoint
+        self.api_key = settings.rerank_api_key
+        self.model_name = settings.rerank_model
+        self.top_k = settings.rerank_top_k
+        self.weight = settings.rerank_weight
+
+        # GCP 相关配置
+        self.project_id = settings.gcp_project_id
+        self.location = settings.gcp_location
+        self.vertex_endpoint_id = settings.vertex_rerank_endpoint_id
+
+        # 调试信息：检查初始化状态
+        print(f"DEBUG - Provider: {self.provider}")
+        print(f"DEBUG - GCP Project: {self.project_id}")
+        print(f"DEBUG - Vertex Endpoint ID: {self.vertex_endpoint_id}")
+        print(f"DEBUG - AI Platform Lib Loaded: {aiplatform is not None}")
+
+        # 初始化 Vertex AI
+        if self.provider == "vertex" and aiplatform and self.project_id:
+            print(f"DEBUG - Initializing Vertex AI in {self.location}")
+            aiplatform.init(project=self.project_id, location=self.location)
+
+        # 如果是本地模式且尚未加载模型
+        if self.provider == "local-bge" and FlagReranker and Reranker._instance is None:
+            Reranker._instance = FlagReranker(self.model_name, use_fp16=True)
+
+    def _call_model_rerank(self, query: str, passages: List[str]) -> List[float]:
+        """调用重排模型"""
+        if self.provider == "vertex" and aiplatform and self.vertex_endpoint_id:
+            endpoint = aiplatform.Endpoint(self.vertex_endpoint_id)
+
+            candidate_payloads = [
+                [{"inputs": [[query, p] for p in passages]}],
+                [{"inputs": [query, p]} for p in passages],
+                [{"inputs": {"query": query, "passage": p}} for p in passages],
+                [{"inputs": {"source_sentence": query, "sentences": passages}}],
+                [{"text": [query, p]} for p in passages],
+                [{"query": query, "passage": p} for p in passages],
+            ]
+
+            response = None
+            last_error = None
+            for idx, instances in enumerate(candidate_payloads, start=1):
+                print(f"DEBUG - Attempting format {idx}: {instances[:1]}")
+                try:
+                    response = endpoint.predict(instances=instances)
+                    break
+                except Exception as e:
+                    last_error = e
+                    print(f"DEBUG - Format {idx} failed: {e}")
+
+            if response is None:
+                raise last_error or RuntimeError("Vertex rerank prediction failed")
+            
+            print(f"DEBUG - Vertex AI Raw Predictions: {response.predictions}")
+            
+            # 通用分数提取逻辑
+            scores = self._extract_vertex_scores(response.predictions)
+            if len(scores) != len(passages):
+                raise ValueError(
+                    f"Vertex returned {len(scores)} scores for {len(passages)} passages: "
+                    f"{response.predictions}"
+                )
+            
+            print(f"DEBUG - Extracted Semantic Scores: {scores}")
+            return scores
+
+        if self.provider == "local-bge" and Reranker._instance:
+            # FlagReranker 的输入是 (query, passage) 元组列表
+            pairs = [[query, p] for p in passages]
+            scores = Reranker._instance.compute_score(pairs)
+            # 处理可能的单标量返回
+            return scores if isinstance(scores, list) else [float(scores)]
+
+        if self.provider == "mock" or not self.endpoint:
+            return self._generic_rerank_logic(query, passages)
+
+        headers = {"Content-Type": "application/json"}
+        if self.api_key:
+            headers["Authorization"] = f"Bearer {self.api_key}"
+
+        payload = {"query": query, "passages": passages}
+        try:
+            with httpx.Client(timeout=30) as client:
+                response = client.post(self.endpoint, json=payload, headers=headers)
+                response.raise_for_status()
+                data = response.json()
+                # 假设你的模型服务返回格式为 {"scores": [0.9, 0.1, ...]}
+                return data.get("scores") or []
+        except Exception:
+            return self._generic_rerank_logic(query, passages) # 异常降级
+
+    def _extract_vertex_scores(self, predictions: Any) -> List[float]:
+        """从 Vertex 自定义容器的常见返回格式中提取 rerank 分数。"""
+        if isinstance(predictions, dict):
+            for key in ("scores", "logits", "predictions"):
+                if key in predictions:
+                    return self._extract_vertex_scores(predictions[key])
+            if "score" in predictions:
+                return [float(predictions["score"])]
+            return []
+
+        if not isinstance(predictions, list):
+            return [float(predictions)]
+
+        if not predictions:
+            return []
+
+        if all(isinstance(item, (int, float)) for item in predictions):
+            return [float(item) for item in predictions]
+
+        if len(predictions) == 1 and isinstance(predictions[0], (list, dict)):
+            return self._extract_vertex_scores(predictions[0])
+
+        scores = []
+        for pred in predictions:
+            if isinstance(pred, dict):
+                if "score" in pred:
+                    scores.append(float(pred["score"]))
+                elif "scores" in pred:
+                    extracted = self._extract_vertex_scores(pred["scores"])
+                    scores.append(float(extracted[0]) if extracted else 0.0)
+                elif "logits" in pred:
+                    extracted = self._extract_vertex_scores(pred["logits"])
+                    scores.append(float(extracted[0]) if extracted else 0.0)
+                else:
+                    scores.append(0.0)
+            elif isinstance(pred, list):
+                extracted = self._extract_vertex_scores(pred)
+                scores.append(float(extracted[0]) if extracted else 0.0)
+            else:
+                scores.append(float(pred))
+        return scores
+
+    def _generic_rerank_logic(self, query: str, passages: List[str]) -> List[float]:
+        """
+        通用重排逻辑：使用词频重叠度模拟评分，不依赖特定硬件。
+        """
+        scores = []
+        q_terms = set(_tokenize(query))
+        for passage in passages:
+            p_terms = _tokenize(passage)
+            if not p_terms:
+                scores.append(0.0)
+                continue
+            intersection = q_terms.intersection(set(p_terms))
+            score = (len(intersection) / (len(q_terms) or 1))
+            scores.append(float(score))
+        return scores
+
+    def _multi_route_scores(self, query: str, passages: List[dict]) -> List[float]:
+        """多路召回融合：召回得分 + 词面(重叠) + 语义评分的混合分数。"""
+        texts = [p["text"] for p in passages]
+        lexical_scores = [_overlap_score(query, text) for text in texts]
+        recall_scores = [float(p.get("recall_score", 0.0)) for p in passages]
+
+        # 从原来的本地模拟逻辑改为调用我们新增的模型方法
+        semantic_scores = self._call_model_rerank(query, texts)
+
+        recall_weight = 0.2 if any(score > 0 for score in recall_scores) else 0.0
+        blended_scores = []
+        for recall, lexical, semantic in zip(recall_scores, lexical_scores, semantic_scores):
+            combined = self.weight * semantic + (1 - self.weight) * lexical
+            blended_scores.append((1 - recall_weight) * combined + recall_weight * recall)
+        return blended_scores
+
+    def rerank(self, query: str, passages: List[dict]) -> List[dict]:
+        """
+        多路召回 + 二次精排：
+        1) 初始召回已由向量检索得到候选。
+        2) 结合词面重叠与模型语义得分进行精排。
+        3) 返回 Top-K 结果，目标提升 Top-5 命中率（需基准测试验证）。
+        """
+        if not passages:
+            return []
+
+        scores = self._multi_route_scores(query, passages)
+
+        for idx, passage in enumerate(passages):
+            passage["rerank_score"] = scores[idx]
+
+        # 按优化后的得分降序排列
+        passages.sort(key=lambda p: p.get("rerank_score", 0.0), reverse=True)
+        return passages[: self.top_k]

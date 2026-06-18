@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  pipeline:
+    build:
+      context: .
+      dockerfile: Dockerfile.pipeline
+    ports:
+      - "9000:9000"
+    env_file:
+      - .env
+    volumes:
+      - ./milvus_data:/app/milvus_data
+      - ./models_cache:/app/models_cache
+      # 挂载本地 GCP 凭据，让容器内代码能访问 Vertex AI
+      - ~/.config/gcloud:/root/.config/gcloud
+    # 如果你有英伟达显卡并安装了 nvidia-container-toolkit，可以开启 GPU
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: 1
+    #           capabilities: [gpu]

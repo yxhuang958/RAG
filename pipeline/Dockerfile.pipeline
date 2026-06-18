@@ -1,0 +1,26 @@
+# Use an appropriate base image, e.g., Python 3.10 or 3.14 as seen in workspace
+FROM python:3.10-slim
+
+WORKDIR /app
+
+# 安装系统依赖（如 git, curl 等，某些库编译可能需要）
+RUN apt-get update && apt-get install -y \
+    curl \
+    git \
+    && rm -rf /var/lib/apt/lists/*
+
+# 安装 Python 依赖
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# 设置缓存目录，避免容器重启后重复下载模型
+ENV HF_HOME=/app/models_cache
+ENV SENTENCE_TRANSFORMERS_HOME=/app/models_cache
+
+# 拷贝代码
+COPY ./app ./app
+
+EXPOSE 9000
+
+# 默认启动
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "9000"]
