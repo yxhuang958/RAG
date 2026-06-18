@@ -45,14 +45,14 @@ async def health() -> dict:
 
 
 @app.post("/ingest")
-async def ingest(file: UploadFile = File(...)) -> dict:
+def ingest(file: UploadFile = File(...)) -> dict:
     """处理上传的 PDF,进行解析、切片、向量化并存入 Milvus"""
     # 1. 校验文件格式
     if not file.filename.lower().endswith(".pdf"):
         raise HTTPException(status_code=400, detail="Only PDF files are supported")
 
     # 2. 读取文件内容到内存
-    content = await file.read()
+    content = file.file.read()
     if not content:
         raise HTTPException(status_code=400, detail="Empty file")
 
@@ -96,7 +96,7 @@ async def ingest(file: UploadFile = File(...)) -> dict:
 
 
 @app.post("/query")
-async def query(payload: QueryRequest) -> dict:
+def query(payload: QueryRequest) -> dict:
     """接收完整会话消息，最后一条消息作为本轮新问题。"""
     if not payload.messages:
         raise HTTPException(status_code=400, detail="Messages are required")

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import math
+import time
 from typing import Any, List, Optional
 import httpx
 
@@ -63,6 +64,35 @@ class Reranker:
         if self.provider == "local-bge" and FlagReranker and Reranker._instance is None:
             Reranker._instance = FlagReranker(self.model_name, use_fp16=True)
 
+    def _is_transient_vertex_error(self, error: Exception) -> bool:
+        message = str(error).lower()
+        return (
+            "429" in message
+            or "not yet ready" in message
+            or "scale-up from zero" in message
+            or "resource exhausted" in message
+            or "temporarily unavailable" in message
+        )
+
+    def _predict_vertex_with_retry(self, endpoint, instances: list[dict]) -> Any:
+        last_error: Exception | None = None
+        for attempt in range(4):
+            try:
+                return endpoint.predict(instances=instances)
+            except Exception as error:
+                last_error = error
+                if not self._is_transient_vertex_error(error) or attempt == 3:
+                    raise
+
+                wait_seconds = 2 ** attempt
+                print(
+                    f"WARNING - Vertex rerank endpoint is warming up; "
+                    f"retrying in {wait_seconds}s ({attempt + 1}/4): {error}"
+                )
+                time.sleep(wait_seconds)
+
+        raise last_error or RuntimeError("Vertex rerank prediction failed")
+
     def _call_model_rerank(self, query: str, passages: List[str]) -> List[float]:
         """调用重排模型"""
         if self.provider == "vertex" and aiplatform and self.vertex_endpoint_id:
@@ -82,14 +112,15 @@ class Reranker:
             for idx, instances in enumerate(candidate_payloads, start=1):
                 print(f"DEBUG - Attempting format {idx}: {instances[:1]}")
                 try:
-                    response = endpoint.predict(instances=instances)
+                    response = self._predict_vertex_with_retry(endpoint, instances)
                     break
                 except Exception as e:
                     last_error = e
                     print(f"DEBUG - Format {idx} failed: {e}")
 
             if response is None:
-                raise last_error or RuntimeError("Vertex rerank prediction failed")
+                print(f"WARNING - Vertex rerank failed; using lexical fallback: {last_error}")
+                return self._generic_rerank_logic(query, passages)
             
             print(f"DEBUG - Vertex AI Raw Predictions: {response.predictions}")
             
@@ -194,7 +225,11 @@ class Reranker:
         recall_scores = [float(p.get("recall_score", 0.0)) for p in passages]
 
         # 从原来的本地模拟逻辑改为调用我们新增的模型方法
-        semantic_scores = self._call_model_rerank(query, texts)
+        try:
+            semantic_scores = self._call_model_rerank(query, texts)
+        except Exception as error:
+            print(f"WARNING - Rerank model failed; using lexical fallback: {error}")
+            semantic_scores = self._generic_rerank_logic(query, texts)
 
         recall_weight = 0.2 if any(score > 0 for score in recall_scores) else 0.0
         blended_scores = []

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import threading
 from typing import Any, List
 
 from pymilvus import Collection, CollectionSchema, DataType, FieldSchema, connections, utility
@@ -7,14 +8,30 @@ from pymilvus import Collection, CollectionSchema, DataType, FieldSchema, connec
 from .config import get_settings
 
 
+_CONNECTION_ALIAS = "default"
+_CONNECTION_LOCK = threading.Lock()
+
+
 def connect_milvus() -> None:
+    with _CONNECTION_LOCK:
+        if connections.has_connection(_CONNECTION_ALIAS):
+            return
+
+        try:
+            _connect_milvus()
+        except Exception:
+            _reset_milvus_connection()
+            _connect_milvus()
+
+
+def _connect_milvus() -> None:
     settings = get_settings()
     if settings.milvus_uri:
-        connections.connect(alias="default", uri=settings.milvus_uri, token=settings.milvus_token)
+        connections.connect(alias=_CONNECTION_ALIAS, uri=settings.milvus_uri, token=settings.milvus_token)
         return
 
     connections.connect(
-        alias="default",
+        alias=_CONNECTION_ALIAS,
         host=settings.milvus_host,
         port=settings.milvus_port,
         user=settings.milvus_user,
@@ -22,7 +39,28 @@ def connect_milvus() -> None:
     )
 
 
+def _reset_milvus_connection() -> None:
+    try:
+        connections.disconnect(_CONNECTION_ALIAS)
+    except Exception:
+        pass
+    try:
+        connections.remove_connection(_CONNECTION_ALIAS)
+    except Exception:
+        pass
+
+
 def get_or_create_collection(dim: int) -> Collection:
+    try:
+        return _get_or_create_collection(dim)
+    except Exception:
+        with _CONNECTION_LOCK:
+            _reset_milvus_connection()
+            _connect_milvus()
+        return _get_or_create_collection(dim)
+
+
+def _get_or_create_collection(dim: int) -> Collection:
     settings = get_settings()
     name = settings.milvus_collection
 
