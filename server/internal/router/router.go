@@ -23,6 +23,7 @@ func Setup() *gin.Engine {
 	{
 		// 文件上传
 		api.POST("/upload", handlers.Upload)
+		api.GET("/upload/status", handlers.UploadStatus)
 
 		// 问答检索
 		api.POST("/query", handlers.Query)

@@ -10,6 +10,16 @@ const statusItems = [
 
 const apiBaseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
+const formatContextLabel = (ctx, index) => {
+    const chunk = ctx.chunk_index ?? index;
+    const score = ctx.rerank_score ?? ctx.score;
+    const scoreLabel = Number.isFinite(Number(score)) ? `score ${Number(score).toFixed(3)}` : 'score n/a';
+    const docLabel = ctx.doc_id ? String(ctx.doc_id).split('-').slice(0, -1).join('-') || ctx.doc_id : 'document';
+    const preview = (ctx.text || '').replace(/\s+/g, ' ').trim();
+
+    return `#${chunk} · ${scoreLabel} · ${docLabel}${preview ? ` · ${preview}` : ''}`;
+};
+
 function App() {
     const [username, setUsername] = useState('demo');
     const [password, setPassword] = useState('demo');
@@ -36,6 +46,68 @@ function App() {
         if (!token) return;
         refreshSessions();
     }, [token]);
+
+    useEffect(() => {
+        if (!token) return;
+
+        const loadUploadStatus = async () => {
+            try {
+                const response = await fetch(`${apiBaseUrl}/api/upload/status`, {
+                    headers: authHeaders
+                });
+                const result = await response.json();
+                if (!response.ok) return;
+
+                if (result.status === 'processing') {
+                    setIsUploading(true);
+                    setUploadStatus(`Uploading: ${result.filename || 'document'}`);
+                } else if (result.status === 'failed') {
+                    setUploadStatus(result.error || 'Upload failed.');
+                }
+            } catch (error) {
+                setUploadStatus('Ready for ingestion...');
+            }
+        };
+
+        loadUploadStatus();
+    }, [authHeaders, token]);
+
+    useEffect(() => {
+        if (!token || !isUploading) return undefined;
+
+        let cancelled = false;
+        const pollUploadStatus = async () => {
+            try {
+                const response = await fetch(`${apiBaseUrl}/api/upload/status`, {
+                    headers: authHeaders
+                });
+                const result = await response.json();
+                if (cancelled || !response.ok) return;
+
+                if (result.status === 'completed') {
+                    const uploadedName = result.result?.filename || result.result?.doc_id || result.filename || selectedFile?.name;
+                    setUploadStatus(`Uploaded: ${uploadedName}`);
+                    setIsUploading(false);
+                } else if (result.status === 'failed') {
+                    setUploadStatus(result.error || 'Upload failed.');
+                    setIsUploading(false);
+                } else if (result.status === 'processing') {
+                    setUploadStatus(`Uploading: ${result.filename || selectedFile?.name || 'document'}`);
+                }
+            } catch (error) {
+                if (!cancelled) {
+                    setUploadStatus('Checking upload status...');
+                }
+            }
+        };
+
+        pollUploadStatus();
+        const interval = window.setInterval(pollUploadStatus, 2000);
+        return () => {
+            cancelled = true;
+            window.clearInterval(interval);
+        };
+    }, [authHeaders, isUploading, selectedFile, token]);
 
     const handleLogin = async () => {
         setLoginStatus('Signing in...');
@@ -96,6 +168,7 @@ function App() {
     };
 
     const handleFileChange = (event) => {
+        if (isUploading) return;
         const file = event.target.files?.[0] || null;
         setSelectedFile(file);
         setUploadStatus(file ? `Selected: ${file.name}` : 'Ready for ingestion...');
@@ -127,13 +200,13 @@ function App() {
 
             if (!response.ok) {
                 setUploadStatus(result.error || 'Upload failed.');
+                setIsUploading(false);
                 return;
             }
 
-            setUploadStatus(`Uploaded: ${result.filename || result.doc_id || selectedFile.name}`);
+            setUploadStatus(`Uploading: ${result.filename || selectedFile.name}`);
         } catch (error) {
             setUploadStatus('Upload failed. Please try again.');
-        } finally {
             setIsUploading(false);
         }
     };
@@ -262,10 +335,10 @@ function App() {
                     <h3>Upload knowledge</h3>
                     <div className="upload-box">
                         <span>Select PDF files</span>
-                        <label className="upload-button" htmlFor="pdf-upload">
+                        <label className={isUploading ? 'upload-button disabled' : 'upload-button'} htmlFor="pdf-upload">
                             {selectedFile ? 'Change' : 'Browse'}
                         </label>
-                        <input id="pdf-upload" type="file" accept="application/pdf" onChange={handleFileChange} />
+                        <input id="pdf-upload" type="file" accept="application/pdf" onChange={handleFileChange} disabled={isUploading} />
                     </div>
                     <div className="file-list">
                         <div className="file-item">
@@ -301,8 +374,8 @@ function App() {
                                 {contexts.length === 0 ? (
                                     <span className="token">No contexts yet</span>
                                 ) : contexts.slice(0, 3).map((ctx, index) => (
-                                    <span className="token" key={`${ctx.doc_id || 'chunk'}-${index}`}>
-                                        #{ctx.chunk_index ?? index}
+                                    <span className="token context-token" key={`${ctx.doc_id || 'chunk'}-${index}`} title={ctx.text || formatContextLabel(ctx, index)}>
+                                        {formatContextLabel(ctx, index)}
                                     </span>
                                 ))}
                             </div>

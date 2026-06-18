@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"io"
@@ -8,11 +9,28 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/gin-gonic/gin"
 	"rag-server/internal/config"
 )
+
+type uploadJobState struct {
+	Status    string         `json:"status"`
+	Filename  string         `json:"filename,omitempty"`
+	UserID    string         `json:"-"`
+	Error     string         `json:"error,omitempty"`
+	Result    map[string]any `json:"result,omitempty"`
+	UpdatedAt time.Time      `json:"updated_at"`
+}
+
+var uploadJobs = struct {
+	sync.Mutex
+	state uploadJobState
+}{
+	state: uploadJobState{Status: "idle", UpdatedAt: time.Now()},
+}
 
 // Upload 处理 PDF 文件上传，并转发到云端 ingest 服务
 func Upload(c *gin.Context) {
@@ -35,14 +53,85 @@ func Upload(c *gin.Context) {
 		return
 	}
 
+	if !startUploadJob(user.UserID, file.Filename) {
+		c.JSON(http.StatusConflict, gin.H{"error": "another document is still being processed"})
+		return
+	}
+
 	// 打开文件流
 	opened, err := file.Open()
 	if err != nil {
+		failUploadJob("failed to open file")
 		c.JSON(http.StatusBadRequest, gin.H{"error": "failed to open file"})
 		return
 	}
 	defer opened.Close()
 
+	content, err := io.ReadAll(opened)
+	if err != nil {
+		failUploadJob("failed to read file")
+		c.JSON(http.StatusBadRequest, gin.H{"error": "failed to read file"})
+		return
+	}
+
+	go runIngestJob(user.UserID, file.Filename, content)
+
+	c.JSON(http.StatusAccepted, gin.H{
+		"status":   "processing",
+		"filename": file.Filename,
+	})
+}
+
+func UploadStatus(c *gin.Context) {
+	if _, ok := CurrentUser(c); !ok {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+		return
+	}
+
+	uploadJobs.Lock()
+	state := uploadJobs.state
+	uploadJobs.Unlock()
+
+	c.JSON(http.StatusOK, state)
+}
+
+func startUploadJob(userID, filename string) bool {
+	uploadJobs.Lock()
+	defer uploadJobs.Unlock()
+
+	if uploadJobs.state.Status == "processing" {
+		return false
+	}
+
+	uploadJobs.state = uploadJobState{
+		Status:    "processing",
+		Filename:  filename,
+		UserID:    userID,
+		UpdatedAt: time.Now(),
+	}
+	return true
+}
+
+func finishUploadJob(result map[string]any) {
+	uploadJobs.Lock()
+	defer uploadJobs.Unlock()
+
+	uploadJobs.state.Status = "completed"
+	uploadJobs.state.Error = ""
+	uploadJobs.state.Result = result
+	uploadJobs.state.UpdatedAt = time.Now()
+}
+
+func failUploadJob(message string) {
+	uploadJobs.Lock()
+	defer uploadJobs.Unlock()
+
+	uploadJobs.state.Status = "failed"
+	uploadJobs.state.Error = message
+	uploadJobs.state.UpdatedAt = time.Now()
+}
+
+func runIngestJob(userID, filename string, content []byte) {
 	// 云端 Pipeline ingest 接口地址
 	pipelineURL := config.GetEnv("PIPELINE_URL", "http://localhost:9000")
 	ingestURL := pipelineURL + "/ingest"
@@ -54,7 +143,7 @@ func Upload(c *gin.Context) {
 		timeoutSeconds = 120
 	}
 
-	ctx, cancel := context.WithTimeout(c.Request.Context(), time.Duration(timeoutSeconds)*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(timeoutSeconds)*time.Second)
 	defer cancel()
 
 	// 用 Pipe 组装 multipart 请求体，避免本地落盘
@@ -66,15 +155,15 @@ func Upload(c *gin.Context) {
 		defer multipartWriter.Close()
 
 		// 写入用户 ID 字段
-		_ = multipartWriter.WriteField("user_id", user.UserID)
+		_ = multipartWriter.WriteField("user_id", userID)
 
-		part, err := multipartWriter.CreateFormFile("file", file.Filename) // 创建 multipart 文件字段，用于server端接收识别
+		part, err := multipartWriter.CreateFormFile("file", filename) // 创建 multipart 文件字段，用于server端接收识别
 		if err != nil {
 			_ = writer.CloseWithError(err)
 			return
 		}
 
-		if _, err := io.Copy(part, opened); err != nil { // 写入文件内容，流式传输
+		if _, err := io.Copy(part, bytes.NewReader(content)); err != nil { // 写入文件内容，流式传输
 			_ = writer.CloseWithError(err)
 			return
 		}
@@ -116,7 +205,7 @@ func Upload(c *gin.Context) {
 	// 构建转发请求
 	request, err := http.NewRequestWithContext(ctx, http.MethodPost, ingestURL, reader)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to create ingest request"})
+		failUploadJob("failed to create ingest request")
 		return
 	}
 	request.Header.Set("Content-Type", multipartWriter.FormDataContentType())
@@ -133,10 +222,10 @@ func Upload(c *gin.Context) {
 	response, err := client.Do(request)
 	if err != nil {
 		if ctx.Err() == context.DeadlineExceeded {
-			c.JSON(http.StatusGatewayTimeout, gin.H{"error": "ingest timed out"})
+			failUploadJob("ingest timed out")
 			return
 		}
-		c.JSON(http.StatusBadGateway, gin.H{"error": "failed to call ingest service"})
+		failUploadJob("failed to call ingest service")
 		return
 	}
 	defer response.Body.Close()
@@ -144,26 +233,20 @@ func Upload(c *gin.Context) {
 	// 读取云端返回
 	body, err := io.ReadAll(response.Body)
 	if err != nil {
-		c.JSON(http.StatusBadGateway, gin.H{"error": "failed to read ingest response"})
+		failUploadJob("failed to read ingest response")
 		return
 	}
 
 	if response.StatusCode < http.StatusOK || response.StatusCode >= http.StatusMultipleChoices {
-		c.JSON(http.StatusBadGateway, gin.H{
-			"error":   "ingest failed",
-			"details": strings.TrimSpace(string(body)),
-		})
+		failUploadJob("ingest failed: " + strings.TrimSpace(string(body)))
 		return
 	}
 
 	var payload map[string]any
 	if err := json.Unmarshal(body, &payload); err != nil {
-		c.JSON(http.StatusBadGateway, gin.H{
-			"error":   "invalid ingest response",
-			"details": strings.TrimSpace(string(body)),
-		})
+		failUploadJob("invalid ingest response: " + strings.TrimSpace(string(body)))
 		return
 	}
 
-	c.JSON(http.StatusOK, payload) // 直接将云端返回的 JSON payload 转发给前端, const result = await response.json();
+	finishUploadJob(payload)
 }
