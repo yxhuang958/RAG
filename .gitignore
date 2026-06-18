@@ -7,3 +7,5 @@ dist/
 .env
 
 note.txt
+
+server/data/

@@ -213,6 +213,10 @@
     opacity: 0.6;
 }
 
+.card button:disabled {
+    background: #9ca3af;
+}
+
 .ghost-button {
     background: #e5e7eb !important;
     color: #111827 !important;

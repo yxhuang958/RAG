@@ -56,8 +56,8 @@ class Settings:
     vertex_embedding_endpoint_id: str | None = os.getenv("VERTEX_EMBEDDING_ENDPOINT_ID")
     vertex_rerank_endpoint_id: str | None = os.getenv("VERTEX_RERANK_ENDPOINT_ID")
 
-    chunk_size: int = int(os.getenv("CHUNK_SIZE", "800"))
-    chunk_overlap: int = int(os.getenv("CHUNK_OVERLAP", "120"))
+    chunk_size: int = int(os.getenv("CHUNK_SIZE", "500"))
+    chunk_overlap: int = int(os.getenv("CHUNK_OVERLAP", "80"))
     debug: bool = _get_bool(os.getenv("DEBUG"), False)
 
 

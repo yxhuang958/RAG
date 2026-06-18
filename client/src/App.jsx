@@ -31,6 +31,7 @@ function App() {
     const [selectedFile, setSelectedFile] = useState(null);
     const [uploadStatus, setUploadStatus] = useState('Ready for ingestion...');
     const [isUploading, setIsUploading] = useState(false);
+    const [shouldPollUpload, setShouldPollUpload] = useState(false);
     const [question, setQuestion] = useState('');
     const [answer, setAnswer] = useState('');
     const [contexts, setContexts] = useState([]);
@@ -60,6 +61,7 @@ function App() {
 
                 if (result.status === 'processing') {
                     setIsUploading(true);
+                    setShouldPollUpload(true);
                     setUploadStatus(`Uploading: ${result.filename || 'document'}`);
                 } else if (result.status === 'failed') {
                     setUploadStatus(result.error || 'Upload failed.');
@@ -73,7 +75,7 @@ function App() {
     }, [authHeaders, token]);
 
     useEffect(() => {
-        if (!token || !isUploading) return undefined;
+        if (!token || !shouldPollUpload) return undefined;
 
         let cancelled = false;
         const pollUploadStatus = async () => {
@@ -88,9 +90,11 @@ function App() {
                     const uploadedName = result.result?.filename || result.result?.doc_id || result.filename || selectedFile?.name;
                     setUploadStatus(`Uploaded: ${uploadedName}`);
                     setIsUploading(false);
+                    setShouldPollUpload(false);
                 } else if (result.status === 'failed') {
                     setUploadStatus(result.error || 'Upload failed.');
                     setIsUploading(false);
+                    setShouldPollUpload(false);
                 } else if (result.status === 'processing') {
                     setUploadStatus(`Uploading: ${result.filename || selectedFile?.name || 'document'}`);
                 }
@@ -107,7 +111,7 @@ function App() {
             cancelled = true;
             window.clearInterval(interval);
         };
-    }, [authHeaders, isUploading, selectedFile, token]);
+    }, [authHeaders, selectedFile, shouldPollUpload, token]);
 
     const handleLogin = async () => {
         setLoginStatus('Signing in...');
@@ -185,6 +189,7 @@ function App() {
         }
 
         setIsUploading(true);
+        setShouldPollUpload(false);
         setUploadStatus('Uploading...');
 
         try {
@@ -201,13 +206,16 @@ function App() {
             if (!response.ok) {
                 setUploadStatus(result.error || 'Upload failed.');
                 setIsUploading(false);
+                setShouldPollUpload(false);
                 return;
             }
 
             setUploadStatus(`Uploading: ${result.filename || selectedFile.name}`);
+            setShouldPollUpload(true);
         } catch (error) {
             setUploadStatus('Upload failed. Please try again.');
             setIsUploading(false);
+            setShouldPollUpload(false);
         }
     };
 
