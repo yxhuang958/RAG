@@ -2,10 +2,13 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 import os
+from pathlib import Path
 from dotenv import load_dotenv
 
 # 加载 .env 文件
 load_dotenv()
+
+_REPO_ROOT = Path(__file__).resolve().parents[2]
 
 def _get_bool(value: str | None, default: bool = False) -> bool:
     if value is None:
@@ -58,6 +61,10 @@ class Settings:
 
     chunk_size: int = int(os.getenv("CHUNK_SIZE", "500"))
     chunk_overlap: int = int(os.getenv("CHUNK_OVERLAP", "80"))
+    document_store_path: str = os.getenv(
+        "DOCUMENT_STORE_PATH",
+        str(_REPO_ROOT / "server" / "data" / "pipeline_documents.json"),
+    )
     debug: bool = _get_bool(os.getenv("DEBUG"), False)
 
 

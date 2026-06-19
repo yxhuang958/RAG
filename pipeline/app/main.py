@@ -1,7 +1,8 @@
 from __future__ import annotations
 
+import hashlib
 import io
-import uuid
+import re
 from typing import List
 
 from fastapi import FastAPI, File, HTTPException, UploadFile
@@ -10,6 +11,7 @@ from pydantic import BaseModel
 from pypdf import PdfReader
 
 from .config import get_settings
+from .document_store import DocumentStore
 from .embedding import EmbeddingClient
 from .milvus_store import connect_milvus, get_or_create_collection, insert_chunks
 from .qa import QAPipeline
@@ -17,6 +19,7 @@ from .text_utils import chunk_text
 
 app = FastAPI(title="RAG Pipeline")
 settings = get_settings()
+document_store = DocumentStore(settings.document_store_path)
 
 app.add_middleware(
     CORSMiddleware,
@@ -74,23 +77,56 @@ def ingest(file: UploadFile = File(...)) -> dict:
     if not chunks:
         raise HTTPException(status_code=400, detail="Failed to create chunks")
 
+    file_hash = _sha256_hex(content)
+    content_hash = _sha256_text("\n\n".join(chunks))
+    doc_id = _build_doc_id(file.filename, content_hash)
+    document, is_new = document_store.reserve(
+        content_hash=content_hash,
+        file_hash=file_hash,
+        doc_id=doc_id,
+        filename=file.filename,
+        chunks=len(chunks),
+    )
+    if not is_new:
+        if document.get("status") == "ready" and not document.get("chunk_texts"):
+            document = document_store.attach_chunk_texts(content_hash, chunks) or document
+        return {
+            "status": "duplicate" if document.get("status") == "ready" else document.get("status"),
+            "doc_id": document.get("doc_id"),
+            "filename": document.get("filename"),
+            "chunks": document.get("chunks", 0),
+            "collection": document.get("collection", settings.milvus_collection),
+            "content_hash": content_hash,
+            "duplicate": document.get("status") == "ready",
+        }
+
     # 5. 调用 Embedding 接口进行向量化
-    embedding = EmbeddingClient()
-    vectors = embedding.embed(chunks)
+    try:
+        embedding = EmbeddingClient()
+        vectors = embedding.embed(chunks)
 
-    # 6. 连接 Milvus 并获取/创建集合
-    connect_milvus()
-    collection = get_or_create_collection(len(vectors[0]))
+        # 6. 连接 Milvus 并获取/创建集合
+        connect_milvus()
+        collection = get_or_create_collection(len(vectors[0]))
 
-    # 7. 写入 Milvus
-    doc_id = f"{file.filename}-{uuid.uuid4().hex[:8]}"
-    ids = insert_chunks(collection, doc_id, chunks, vectors)
+        # 7. 写入 Milvus
+        ids = insert_chunks(collection, doc_id, len(chunks), vectors)
+        document = document_store.mark_ready(
+            content_hash,
+            collection=settings.milvus_collection,
+            ids=ids,
+            chunk_texts=chunks,
+        )
+    except Exception as exc:
+        document_store.mark_failed(content_hash, str(exc))
+        raise
 
     return {
         "status": "ok",
-        "doc_id": doc_id,
+        "doc_id": document["doc_id"],
         "chunks": len(chunks),
         "collection": settings.milvus_collection,
+        "content_hash": content_hash,
         "ids": ids,
     }
 
@@ -127,3 +163,18 @@ def query(payload: QueryRequest) -> dict:
         "answer": result["answer"],      # LLM 生成的最终答案
         "contexts": result["contexts"],  # 用于生成的参考原文片段（已重排）
     }
+
+
+def _sha256_hex(content: bytes) -> str:
+    return hashlib.sha256(content).hexdigest()
+
+
+def _sha256_text(text: str) -> str:
+    return hashlib.sha256(text.encode("utf-8")).hexdigest()
+
+
+def _build_doc_id(filename: str, content_hash: str) -> str:
+    stem = re.sub(r"\.pdf$", "", filename, flags=re.IGNORECASE)
+    safe_stem = re.sub(r"[^0-9A-Za-z\u4e00-\u9fff._-]+", "_", stem).strip("._-")
+    safe_stem = safe_stem or "document"
+    return f"{safe_stem}-{content_hash[:12]}"

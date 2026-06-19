@@ -71,7 +71,6 @@ def _get_or_create_collection(dim: int) -> Collection:
             FieldSchema(name="id", dtype=DataType.INT64, is_primary=True, auto_id=True),
             FieldSchema(name="doc_id", dtype=DataType.VARCHAR, max_length=256),
             FieldSchema(name="chunk_index", dtype=DataType.INT64),
-            FieldSchema(name="text", dtype=DataType.VARCHAR, max_length=8192),
             FieldSchema(name="embedding", dtype=DataType.FLOAT_VECTOR, dim=dim),
         ]
         schema = CollectionSchema(fields, description="CANN RAG chunks")
@@ -90,15 +89,19 @@ def _get_or_create_collection(dim: int) -> Collection:
 def insert_chunks(
     collection: Collection,
     doc_id: str,
-    chunks: List[str],
+    chunk_count: int,
     embeddings: List[List[float]],
 ) -> List[int]:
-    if len(chunks) != len(embeddings):
+    if chunk_count != len(embeddings):
         raise ValueError("Chunks and embeddings length mismatch")
 
-    indices = list(range(len(chunks)))
-    doc_ids = [doc_id for _ in chunks]
-    data: List[Any] = [doc_ids, indices, chunks, embeddings]
+    indices = list(range(chunk_count))
+    doc_ids = [doc_id for _ in range(chunk_count)]
+    field_names = {field.name for field in collection.schema.fields}
+    if "text" in field_names:
+        data: List[Any] = [doc_ids, indices, ["" for _ in range(chunk_count)], embeddings]
+    else:
+        data = [doc_ids, indices, embeddings]
     result = collection.insert(data)
     collection.flush()
     return [int(primary_key) for primary_key in result.primary_keys]
@@ -111,7 +114,7 @@ def search(collection: Collection, query_vector: List[float], top_k: int) -> Lis
         anns_field="embedding",
         param=search_params,
         limit=top_k,
-        output_fields=["doc_id", "chunk_index", "text"],
+        output_fields=["doc_id", "chunk_index"],
     )
 
     hits = []
@@ -123,7 +126,6 @@ def search(collection: Collection, query_vector: List[float], top_k: int) -> Lis
                 "score": float(hit.distance),
                 "doc_id": hit.entity.get("doc_id"),
                 "chunk_index": int(chunk_index) if chunk_index is not None else None,
-                "text": hit.entity.get("text"),
             }
         )
     return hits
