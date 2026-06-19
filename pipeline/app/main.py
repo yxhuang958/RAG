@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 import io
 import re
+import time
 from typing import List
 
 from fastapi import FastAPI, File, HTTPException, UploadFile
@@ -134,6 +135,9 @@ def ingest(file: UploadFile = File(...)) -> dict:
 @app.post("/query")
 def query(payload: QueryRequest) -> dict:
     """接收完整会话消息，最后一条消息作为本轮新问题。"""
+    total_start = time.perf_counter()
+    start = time.perf_counter()
+
     if not payload.messages:
         raise HTTPException(status_code=400, detail="Messages are required")
 
@@ -150,14 +154,20 @@ def query(payload: QueryRequest) -> dict:
         raise HTTPException(status_code=400, detail="Last message must be a user question")
     if not question:
         raise HTTPException(status_code=400, detail="Question is required")
+    _log_query_timing("request_parse", start, f"messages={len(messages)} top_k={payload.top_k}")
 
     # 1. 准备 Milvus 集合
+    start = time.perf_counter()
     connect_milvus()
     collection = get_or_create_collection(settings.embedding_dim)
+    _log_query_timing("milvus_prepare", start, f"collection={settings.milvus_collection}")
 
     # 2. 运行无状态 QA Pipeline (检索 -> 重排 -> 构造 Prompt -> 调用 LLM)
+    start = time.perf_counter()
     pipeline = QAPipeline()
     result = pipeline.answer(collection, messages, payload.top_k)
+    _log_query_timing("pipeline_answer", start)
+    _log_query_timing("request_total", total_start)
 
     return {
         "answer": result["answer"],      # LLM 生成的最终答案
@@ -178,3 +188,9 @@ def _build_doc_id(filename: str, content_hash: str) -> str:
     safe_stem = re.sub(r"[^0-9A-Za-z\u4e00-\u9fff._-]+", "_", stem).strip("._-")
     safe_stem = safe_stem or "document"
     return f"{safe_stem}-{content_hash[:12]}"
+
+
+def _log_query_timing(stage: str, start: float, extra: str = "") -> None:
+    elapsed_ms = (time.perf_counter() - start) * 1000
+    suffix = f" {extra}" if extra else ""
+    print(f"TIMING query {stage}={elapsed_ms:.2f}ms{suffix}", flush=True)
