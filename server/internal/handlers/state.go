@@ -1,7 +1,10 @@
 package handlers
 
 import (
+	"bytes"
+	"encoding/json"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
 
@@ -45,6 +48,7 @@ func Login(c *gin.Context) {
 
 	go func() {
 		_ = chatStore.LoadUser(userID)
+		warmupPipeline(userID)
 	}()
 
 	c.JSON(http.StatusOK, gin.H{
@@ -87,4 +91,40 @@ func CurrentUser(c *gin.Context) (userContext, bool) {
 
 func jwtSecret() string {
 	return config.GetEnv("JWT_SECRET", "dev-secret-change-me")
+}
+
+func warmupPipeline(userID string) {
+	pipelineURL := config.GetEnv("PIPELINE_URL", "http://localhost:9000")
+	warmupURL := pipelineURL + "/warmup"
+
+	defaultTimeout := config.GetEnv("PIPELINE_WARMUP_TIMEOUT", "30")
+	timeoutSeconds, err := strconv.Atoi(defaultTimeout)
+	if err != nil || timeoutSeconds <= 0 {
+		timeoutSeconds = 30
+	}
+
+	body, err := json.Marshal(gin.H{"user_id": userID})
+	if err != nil {
+		return
+	}
+
+	request, err := http.NewRequest(http.MethodPost, warmupURL, bytes.NewReader(body))
+	if err != nil {
+		return
+	}
+	request.Header.Set("Content-Type", "application/json")
+
+	apiKey := config.GetEnv("PIPELINE_API_KEY", "")
+	if apiKey != "" {
+		header := config.GetEnv("PIPELINE_API_KEY_HEADER", "Authorization")
+		prefix := config.GetEnv("PIPELINE_API_KEY_PREFIX", "Bearer ")
+		request.Header.Set(header, prefix+apiKey)
+	}
+
+	client := &http.Client{Timeout: time.Duration(timeoutSeconds) * time.Second}
+	response, err := client.Do(request)
+	if err != nil {
+		return
+	}
+	defer response.Body.Close()
 }

@@ -246,7 +246,7 @@ function App() {
                 headers: { 'Content-Type': 'application/json', ...authHeaders },
                 body: JSON.stringify({
                     question: submittedQuestion,
-                    top_k: 6,
+                    top_k: import.meta.env.VITE_RETRIEVE_TOPK || 30,
                     rerank: useRerank,
                     session_id: sessionId
                 })

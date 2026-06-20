@@ -11,7 +11,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
-
+	
 	"github.com/gin-gonic/gin"
 	"rag-server/internal/config"
 )
@@ -48,7 +48,7 @@ func Query(c *gin.Context) {
 		return
 	}
 	if queryPayload.TopK <= 0 {
-		queryPayload.TopK = 6
+		queryPayload.TopK, _ = strconv.Atoi(config.GetEnv("RETRIEVE_TOPK", "30"))
 	}
 	if strings.TrimSpace(queryPayload.SessionID) == "" {
 		queryPayload.SessionID = newSessionID()

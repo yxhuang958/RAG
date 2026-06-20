@@ -14,8 +14,8 @@ from pypdf import PdfReader
 from .config import get_settings
 from .document_store import DocumentStore
 from .embedding import EmbeddingClient
-from .milvus_store import connect_milvus, get_or_create_collection, insert_chunks
-from .qa import QAPipeline
+from .milvus_store import insert_chunks
+from .runtime import get_collection, get_pipeline, warmup
 from .text_utils import chunk_text
 
 app = FastAPI(title="RAG Pipeline")
@@ -36,7 +36,11 @@ class ChatMessage(BaseModel):
 
 class QueryRequest(BaseModel):
     messages: List[ChatMessage]
-    top_k: int = 6
+    top_k: int = settings.retrieve_top_k
+    user_id: str
+
+
+class WarmupRequest(BaseModel):
     user_id: str
 
 
@@ -47,6 +51,14 @@ def root():
 @app.get("/health")
 async def health() -> dict:
     return {"status": "ok"}
+
+
+@app.post("/warmup")
+def warmup_endpoint(payload: WarmupRequest) -> dict:
+    user_id = _normalize_user_id(payload.user_id)
+    if not user_id:
+        raise HTTPException(status_code=400, detail="user_id is required")
+    return warmup(user_id)
 
 
 @app.post("/ingest")
@@ -113,9 +125,8 @@ def ingest(file: UploadFile = File(...), user_id: str = Form(...)) -> dict:
         embedding = EmbeddingClient()
         vectors = embedding.embed(chunks)
 
-        # 6. 连接 Milvus 并获取/创建集合
-        connect_milvus()
-        collection = get_or_create_collection(len(vectors[0]))
+        # 6. 获取已缓存的 Milvus collection
+        collection = get_collection(len(vectors[0]))
 
         # 7. 写入 Milvus
         ids = insert_chunks(collection, user_id, doc_id, len(chunks), vectors)
@@ -170,13 +181,12 @@ def query(payload: QueryRequest) -> dict:
 
     # 1. 准备 Milvus 集合
     start = time.perf_counter()
-    connect_milvus()
-    collection = get_or_create_collection(settings.embedding_dim)
+    collection = get_collection(settings.embedding_dim)
     _log_query_timing("milvus_prepare", start, f"collection={settings.milvus_collection}")
 
     # 2. 运行无状态 QA Pipeline (检索 -> 重排 -> 构造 Prompt -> 调用 LLM)
     start = time.perf_counter()
-    pipeline = QAPipeline(user_id)
+    pipeline = get_pipeline(user_id)
     result = pipeline.answer(collection, messages, payload.top_k)
     _log_query_timing("pipeline_answer", start)
     _log_query_timing("request_total", total_start)

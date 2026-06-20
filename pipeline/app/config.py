@@ -69,7 +69,8 @@ class Settings:
         str(_REPO_ROOT / "server" / "data" / "pipeline_documents.json"),
     )
     debug: bool = _get_bool(os.getenv("DEBUG"), False)
-
+    
+    retrieve_top_k: int = int(os.getenv("RETRIEVE_TOPK", "30"))
 
 _settings: Settings | None = None
 
