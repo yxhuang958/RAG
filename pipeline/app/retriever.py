@@ -10,7 +10,8 @@ from .milvus_store import search
 
 
 class Retriever:
-    def __init__(self) -> None:
+    def __init__(self, user_id: str) -> None:
+        self.user_id = user_id
         self.embedding = EmbeddingClient()
         self.document_store = DocumentStore(get_settings().document_store_path)
 
@@ -22,11 +23,11 @@ class Retriever:
         _log_timing("retriever.embedding", start)
 
         start = time.perf_counter()
-        hits = search(collection, vector, top_k)
+        hits = search(collection, self.user_id, vector, top_k)
         _log_timing("retriever.milvus_search", start, f"hits={len(hits)}")
 
         start = time.perf_counter()
-        hydrated = self.document_store.hydrate_hits(hits)
+        hydrated = self.document_store.hydrate_hits(self.user_id, hits)
         _log_timing("retriever.hydrate_chunks", start, f"contexts={len(hydrated)}")
         _log_timing("retriever.total", total_start)
         return hydrated

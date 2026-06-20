@@ -34,6 +34,8 @@ def _overlap_score(query: str, passage: str) -> float:
 
 class Reranker:
     _instance: Optional[FlagReranker] = None
+    _vertex_failures: int = 0
+    _vertex_circuit_open_until: float = 0.0
 
     def __init__(self) -> None:
         settings = get_settings()
@@ -43,6 +45,9 @@ class Reranker:
         self.model_name = settings.rerank_model
         self.top_k = settings.rerank_top_k
         self.weight = settings.rerank_weight
+        self.circuit_breaker_seconds = settings.rerank_circuit_breaker_seconds
+        self.circuit_breaker_failures = settings.rerank_circuit_breaker_failures
+        self.vertex_retries = max(1, settings.rerank_vertex_retries)
 
         # GCP 相关配置
         self.project_id = settings.gcp_project_id
@@ -74,20 +79,37 @@ class Reranker:
             or "temporarily unavailable" in message
         )
 
+    def _is_vertex_circuit_open(self) -> bool:
+        return time.time() < Reranker._vertex_circuit_open_until
+
+    def _record_vertex_success(self) -> None:
+        Reranker._vertex_failures = 0
+        Reranker._vertex_circuit_open_until = 0.0
+
+    def _record_vertex_failure(self, error: Exception) -> None:
+        Reranker._vertex_failures += 1
+        if Reranker._vertex_failures >= self.circuit_breaker_failures:
+            Reranker._vertex_circuit_open_until = time.time() + self.circuit_breaker_seconds
+            print(
+                f"WARNING - Vertex rerank circuit opened for {self.circuit_breaker_seconds}s "
+                f"after {Reranker._vertex_failures} failure(s): {error}",
+                flush=True,
+            )
+
     def _predict_vertex_with_retry(self, endpoint, instances: list[dict]) -> Any:
         last_error: Exception | None = None
-        for attempt in range(4):
+        for attempt in range(self.vertex_retries):
             try:
                 return endpoint.predict(instances=instances)
             except Exception as error:
                 last_error = error
-                if not self._is_transient_vertex_error(error) or attempt == 3:
+                if not self._is_transient_vertex_error(error) or attempt == self.vertex_retries - 1:
                     raise
 
                 wait_seconds = 2 ** attempt
                 print(
                     f"WARNING - Vertex rerank endpoint is warming up; "
-                    f"retrying in {wait_seconds}s ({attempt + 1}/4): {error}"
+                    f"retrying in {wait_seconds}s ({attempt + 1}/{self.vertex_retries}): {error}"
                 )
                 time.sleep(wait_seconds)
 
@@ -96,6 +118,15 @@ class Reranker:
     def _call_model_rerank(self, query: str, passages: List[str]) -> List[float]:
         """调用重排模型"""
         if self.provider == "vertex" and aiplatform and self.vertex_endpoint_id:
+            if self._is_vertex_circuit_open():
+                remaining = max(0.0, Reranker._vertex_circuit_open_until - time.time())
+                print(
+                    f"WARNING - [Rerank Status]: CIRCUIT_OPEN (熔断中); "
+                    f"using lexical fallback for {remaining:.1f}s",
+                    flush=True,
+                )
+                return self._generic_rerank_logic(query, passages)
+
             endpoint = aiplatform.Endpoint(self.vertex_endpoint_id)
 
             candidate_payloads = [
@@ -117,9 +148,13 @@ class Reranker:
                 except Exception as e:
                     last_error = e
                     print(f"DEBUG - Format {idx} failed: {e}")
+                    if self._is_transient_vertex_error(e):
+                        break
 
             if response is None:
-                print(f"WARNING - Vertex rerank failed; using lexical fallback: {last_error}")
+                if last_error:
+                    self._record_vertex_failure(last_error)
+                print(f"WARNING - [Rerank Status]: FALLBACK (调用失败); using lexical fallback: {last_error}")
                 return self._generic_rerank_logic(query, passages)
             
             print(f"DEBUG - Vertex AI Raw Predictions: {response.predictions}")
@@ -132,7 +167,8 @@ class Reranker:
                     f"{response.predictions}"
                 )
             
-            print(f"DEBUG - Extracted Semantic Scores: {scores}")
+            print(f"INFO - [Rerank Status]: SUCCESS (语义重排成功), Provider: {self.provider}")
+            self._record_vertex_success()
             return scores
 
         if self.provider == "local-bge" and Reranker._instance:

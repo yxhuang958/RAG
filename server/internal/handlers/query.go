@@ -24,8 +24,9 @@ type queryRequest struct {
 }
 
 type pipelineQueryRequest struct {
-	Messages any `json:"messages"`
-	TopK     int `json:"top_k"`
+	Messages any    `json:"messages"`
+	TopK     int    `json:"top_k"`
+	UserID   string `json:"user_id"`
 }
 
 // Query 转发检索+问答请求到云端 Pipeline 服务
@@ -64,6 +65,7 @@ func Query(c *gin.Context) {
 	pipelineBody, err := json.Marshal(pipelineQueryRequest{
 		Messages: chatStore.PipelineMessages(user.UserID, queryPayload.SessionID, queryPayload.Question),
 		TopK:     queryPayload.TopK,
+		UserID:   user.UserID,
 	})
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to build query payload"})

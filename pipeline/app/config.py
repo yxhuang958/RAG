@@ -46,6 +46,9 @@ class Settings:
     rerank_model: str = os.getenv("RERANK_MODEL", "BAAI/bge-reranker-v2-m3") # 新增
     rerank_top_k: int = int(os.getenv("RERANK_TOP_K", "5"))
     rerank_weight: float = float(os.getenv("RERANK_WEIGHT", "0.6"))
+    rerank_circuit_breaker_seconds: int = int(os.getenv("RERANK_CIRCUIT_BREAKER_SECONDS", "60"))
+    rerank_circuit_breaker_failures: int = int(os.getenv("RERANK_CIRCUIT_BREAKER_FAILURES", "1"))
+    rerank_vertex_retries: int = int(os.getenv("RERANK_VERTEX_RETRIES", "2"))
 
     llm_provider: str = os.getenv("LLM_PROVIDER", "http")
     llm_endpoint: str | None = os.getenv("LLM_ENDPOINT")

@@ -9,8 +9,8 @@ from .retriever import Retriever
 
 
 class QAPipeline:
-    def __init__(self) -> None:
-        self.retriever = Retriever()
+    def __init__(self, user_id: str) -> None:
+        self.retriever = Retriever(user_id)
         self.reranker = Reranker()
         self.llm = LLMClient()
 

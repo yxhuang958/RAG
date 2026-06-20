@@ -37,7 +37,7 @@ function App() {
     const [contexts, setContexts] = useState([]);
     const [history, setHistory] = useState([]);
     const [isQuerying, setIsQuerying] = useState(false);
-    const [useRerank, setUseRerank] = useState(true);
+    const useRerank = true;
 
     const authHeaders = useMemo(() => ({
         Authorization: `Bearer ${token}`
@@ -229,15 +229,23 @@ function App() {
             return;
         }
 
+        const submittedQuestion = question.trim();
+        const optimisticUserMessage = {
+            role: 'user',
+            content: submittedQuestion,
+            created_at: Date.now()
+        };
         setIsQuerying(true);
+        setQuestion('');
         setAnswer('Querying...');
+        setHistory((current) => [...current, optimisticUserMessage]);
 
         try {
             const response = await fetch(`${apiBaseUrl}/api/query`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', ...authHeaders },
                 body: JSON.stringify({
-                    question,
+                    question: submittedQuestion,
                     top_k: 6,
                     rerank: useRerank,
                     session_id: sessionId
@@ -247,6 +255,8 @@ function App() {
 
             if (!response.ok) {
                 setAnswer(result.error || 'Query failed.');
+                setQuestion(submittedQuestion);
+                setHistory((current) => current.filter((item) => item !== optimisticUserMessage));
                 return;
             }
 
@@ -258,12 +268,21 @@ function App() {
             setAnswer(result.answer || 'No answer returned.');
             setContexts(result.contexts || []);
             setHistory(result.history || []);
-            setQuestion('');
             refreshSessions();
         } catch (error) {
             setAnswer('Query failed. Please try again.');
+            setQuestion(submittedQuestion);
+            setHistory((current) => current.filter((item) => item !== optimisticUserMessage));
         } finally {
             setIsQuerying(false);
+        }
+    };
+
+    const handleQuestionKeyDown = (event) => {
+        if (event.key !== 'Enter' || event.shiftKey) return;
+        event.preventDefault();
+        if (!isQuerying) {
+            handleQuery();
         }
     };
 
@@ -286,11 +305,11 @@ function App() {
     return (
         <div className="app">
             <header className="hero">
-                <div>
-                    <p className="eyebrow">RAG System</p>
+                <div className='eyebrow_'>
+                    <p className="eyebrow">Private Knowledge System</p>
                     <h1>Session-aware RAG Console</h1>
                     <p className="subtitle">
-                        JWT keeps user state at the app layer; the pipeline receives text context and returns an answer.
+                        {/* JWT keeps user state at the app layer; the pipeline receives text context and returns an answer. */}
                     </p>
                 </div>
                 <div className="hero-card">
@@ -340,21 +359,25 @@ function App() {
                         ))}
                     </div>
 
-                    <h3>Upload knowledge</h3>
-                    <div className="upload-box">
-                        <span>Select PDF files</span>
-                        <label className={isUploading ? 'upload-button disabled' : 'upload-button'} htmlFor="pdf-upload">
-                            {selectedFile ? 'Change' : 'Browse'}
-                        </label>
-                        <input id="pdf-upload" type="file" accept="application/pdf" onChange={handleFileChange} disabled={isUploading} />
-                    </div>
-                    <div className="file-list">
-                        <div className="file-item">
-                            <span>{uploadStatus}</span>
+                    <div className="upload-section">
+                        <h3>Upload knowledge</h3>
+                        <div className="upload-box">
+                            <span className="upload-file-name" title={selectedFile?.name || 'Select PDF files'}>
+                                {selectedFile?.name || 'Select PDF files'}
+                            </span>
+                            <label className={isUploading ? 'upload-button disabled' : 'upload-button'} htmlFor="pdf-upload">
+                                {selectedFile ? 'Change' : 'Browse'}
+                            </label>
+                            <input id="pdf-upload" type="file" accept="application/pdf" onChange={handleFileChange} disabled={isUploading} />
                         </div>
-                        <button type="button" onClick={handleUpload} disabled={isUploading}>
-                            {isUploading ? 'Uploading...' : 'Send to backend'}
-                        </button>
+                        <div className="file-list">
+                            <div className="file-item">
+                                <span>{uploadStatus}</span>
+                            </div>
+                            <button type="button" onClick={handleUpload} disabled={isUploading}>
+                                {isUploading ? 'Uploading...' : 'Send to backend'}
+                            </button>
+                        </div>
                     </div>
                 </section>
 
@@ -396,16 +419,9 @@ function App() {
                             placeholder="Type your question..."
                             value={question}
                             onChange={(event) => setQuestion(event.target.value)}
+                            onKeyDown={handleQuestionKeyDown}
                         />
                         <div className="input-row">
-                            <label className="switch-label">
-                                <input
-                                    type="checkbox"
-                                    checked={useRerank}
-                                    onChange={(event) => setUseRerank(event.target.checked)}
-                                />
-                                Rerank
-                            </label>
                             <button type="button" onClick={handleQuery} disabled={isQuerying}>
                                 {isQuerying ? 'Asking...' : 'Send'}
                             </button>
