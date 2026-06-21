@@ -9,11 +9,19 @@ from dotenv import load_dotenv
 load_dotenv()
 
 _REPO_ROOT = Path(__file__).resolve().parents[2]
+_VECTOR_METRICS = {"L2", "COSINE", "IP"}
 
 def _get_bool(value: str | None, default: bool = False) -> bool:
     if value is None:
         return default
     return value.strip().lower() in {"1", "true", "yes", "y"}
+
+
+def _get_vector_metric() -> str:
+    metric = os.getenv("VECTOR_METRIC", "L2").strip().upper()
+    if metric not in _VECTOR_METRICS:
+        raise ValueError(f"VECTOR_METRIC must be one of {sorted(_VECTOR_METRICS)}, got {metric!r}")
+    return metric
 
 
 @dataclass(frozen=True)
@@ -39,6 +47,8 @@ class Settings:
     embedding_api_key: str | None = os.getenv("EMBEDDING_API_KEY")
     embedding_model: str = os.getenv("EMBEDDING_MODEL", "Qwen/Qwen3-Embedding-0.6B")
     embedding_dim: int = int(os.getenv("EMBEDDING_DIM", "1024"))
+    vector_metric: str = _get_vector_metric()
+    normalize_embeddings: bool = _get_bool(os.getenv("NORMALIZE_EMBEDDINGS"), False)
 
     rag_enabled: bool = _get_bool(os.getenv("RAG_ENABLED"), True)
     multi_retrieval_enabled: bool = _get_bool(os.getenv("MULTI_RETRIEVAL_ENABLED"), False)

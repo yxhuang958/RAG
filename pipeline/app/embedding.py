@@ -30,6 +30,7 @@ class EmbeddingClient:
         self.api_key = settings.embedding_api_key
         self.model_name = settings.embedding_model
         self.dim = settings.embedding_dim
+        self.normalize_embeddings = settings.normalize_embeddings
 
         # 如果是本地模式且尚未加载模型
         if self.provider == "local-st" and EmbeddingClient._instance is None:
@@ -42,7 +43,11 @@ class EmbeddingClient:
     def embed(self, texts: List[str]) -> List[List[float]]:
         # 本地推理逻辑
         if self.provider == "local-st" and EmbeddingClient._instance:
-            embeddings = EmbeddingClient._instance.encode(texts, convert_to_numpy=True)
+            embeddings = EmbeddingClient._instance.encode(
+                texts,
+                convert_to_numpy=True,
+                normalize_embeddings=self.normalize_embeddings,
+            )
             return embeddings.tolist()
 
         if self.provider == "mock" or not self.endpoint:

@@ -22,16 +22,18 @@ def build_prompt(messages: list[dict], contexts: List[dict]) -> str:
     question = messages[-1]["content"]
 
     return (
-        "Task: Answer the question using only the provided RAG context.\n\n"
-        "Grounding rules:\n"
-        "1. Use only facts that are directly supported by the Context section.\n"
-        "2. Do not use prior knowledge, guesses, or unstated assumptions.\n"
-        "3. Cite every factual claim with context IDs like [1] or [2].\n"
-        "4. If the context does not contain enough evidence, answer exactly: "
+        "Task: Answer the question using the provided RAG context.\n\n"
+        "Guidelines:\n"
+        "1. Prefer facts from the Context. Multi-hop conclusions are allowed when they follow from the retrieved passages.\n"
+        "2. Avoid unsupported guesses. If the context is clearly insufficient, answer: "
         "\"I don't know based on the provided context.\"\n"
-        "5. If context passages conflict, state the conflict and cite the conflicting passages instead of guessing.\n"
-        "6. Conversation history is only for resolving references; it is not evidence unless repeated in Context.\n\n"
+        "3. Keep the Answer line concise, especially for factoid questions.\n"
+        "4. Add brief Evidence bullets when helpful, and include context IDs like [1] or [2] when citing specific passages.\n"
+        "5. Use conversation history only to resolve references; the Context is the source of evidence.\n\n"
+        "Preferred output format:\n"
+        "Answer: <short answer only>\n"
+        "Evidence: <optional brief supporting notes with context IDs>\n\n"
         f"Context:\n{context_str}\n\n"
         f"Conversation history:\n{history_str}\n\n"
-        f"Question: {question}\nAnswer:"
+        f"Question: {question}"
     )

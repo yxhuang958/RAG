@@ -73,7 +73,8 @@ def _get_or_create_collection(dim: int) -> Collection:
                 "Create a new collection or rebuild it before enabling private knowledge isolation."
             )
         _chunk_field_name(collection)
-        _vector_field_name(collection)
+        vector_field = _vector_field_name(collection)
+        _validate_vector_metric(collection, vector_field, settings.vector_metric)
     else:
         fields = [
             FieldSchema(name="id", dtype=DataType.INT64, is_primary=True, auto_id=True),
@@ -86,7 +87,7 @@ def _get_or_create_collection(dim: int) -> Collection:
         collection = Collection(name, schema)
         index_params = {
             "index_type": "IVF_FLAT",
-            "metric_type": "L2",
+            "metric_type": settings.vector_metric,
             "params": {"nlist": 1024},
         }
         collection.create_index("embedding", index_params)
@@ -126,7 +127,8 @@ def insert_chunks(
 
 
 def search(collection: Collection, user_id: str, query_vector: List[float], top_k: int) -> List[dict]:
-    search_params = {"metric_type": "L2", "params": {"nprobe": 16}}
+    settings = get_settings()
+    search_params = {"metric_type": settings.vector_metric, "params": {"nprobe": 16}}
     chunk_field = _chunk_field_name(collection)
     vector_field = _vector_field_name(collection)
     result = collection.search(
@@ -142,12 +144,13 @@ def search(collection: Collection, user_id: str, query_vector: List[float], top_
     for hit in result[0]:
         chunk_index = hit.entity.get(chunk_field)
         distance = float(hit.distance)
-        recall_score = 1.0 / (1.0 + max(distance, 0.0))
+        recall_score = _recall_score(distance, settings.vector_metric)
         hits.append(
             {
                 "id": int(hit.id),
                 "score": recall_score,
                 "distance": distance,
+                "metric_type": settings.vector_metric,
                 "recall_score": recall_score,
                 "user_id": hit.entity.get("user_id"),
                 "doc_id": hit.entity.get("doc_id"),
@@ -173,6 +176,30 @@ def _vector_field_name(collection: Collection) -> str:
         if field.dtype == DataType.FLOAT_VECTOR:
             return field.name
     raise RuntimeError(f"Milvus collection '{collection.name}' must have a FLOAT_VECTOR field.")
+
+
+def _validate_vector_metric(collection: Collection, vector_field: str, expected_metric: str) -> None:
+    for index in collection.indexes:
+        if index.field_name != vector_field:
+            continue
+        metric = (index.params or {}).get("metric_type")
+        if metric and str(metric).upper() != expected_metric:
+            raise RuntimeError(
+                f"Milvus collection '{collection.name}' vector index metric is {metric}, "
+                f"but VECTOR_METRIC={expected_metric}. Use the existing metric or create a new collection."
+            )
+        return
+
+
+def _recall_score(raw_distance: float, metric_type: str) -> float:
+    metric = metric_type.upper()
+    if metric == "L2":
+        return 1.0 / (1.0 + max(raw_distance, 0.0))
+    if metric == "COSINE":
+        return max(0.0, min(1.0, 1.0 - raw_distance))
+    if metric == "IP":
+        return max(0.0, min(1.0, raw_distance))
+    return raw_distance
 
 
 def _escape_expr_value(value: str) -> str:
