@@ -238,6 +238,7 @@ function App() {
         setIsQuerying(true);
         setQuestion('');
         setAnswer('Querying...');
+        setContexts([]);
         setHistory((current) => [...current, optimisticUserMessage]);
 
         try {

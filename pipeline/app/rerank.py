@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import math
+import re
 import time
 from typing import Any, List, Optional
 import httpx
@@ -19,8 +20,16 @@ except ImportError:
 from .config import get_settings
 
 
+_LATIN_TOKEN_RE = re.compile(r"[a-z0-9]+")
+_CJK_CHAR_RE = re.compile(r"[\u3400-\u4dbf\u4e00-\u9fff]")
+
+
 def _tokenize(text: str) -> List[str]:
-    return [token for token in text.lower().split() if token]
+    normalized = text.lower()
+    latin_tokens = _LATIN_TOKEN_RE.findall(normalized)
+    cjk_chars = _CJK_CHAR_RE.findall(normalized)
+    cjk_bigrams = [left + right for left, right in zip(cjk_chars, cjk_chars[1:])]
+    return latin_tokens + cjk_chars + cjk_bigrams
 
 
 def _overlap_score(query: str, passage: str) -> float:

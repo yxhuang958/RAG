@@ -141,10 +141,14 @@ def search(collection: Collection, user_id: str, query_vector: List[float], top_
     hits = []
     for hit in result[0]:
         chunk_index = hit.entity.get(chunk_field)
+        distance = float(hit.distance)
+        recall_score = 1.0 / (1.0 + max(distance, 0.0))
         hits.append(
             {
                 "id": int(hit.id),
-                "score": float(hit.distance),
+                "score": recall_score,
+                "distance": distance,
+                "recall_score": recall_score,
                 "user_id": hit.entity.get("user_id"),
                 "doc_id": hit.entity.get("doc_id"),
                 "chunk_index": int(chunk_index) if chunk_index is not None else None,
