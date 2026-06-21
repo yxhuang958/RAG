@@ -40,7 +40,13 @@ class Settings:
     embedding_model: str = os.getenv("EMBEDDING_MODEL", "Qwen/Qwen3-Embedding-0.6B")
     embedding_dim: int = int(os.getenv("EMBEDDING_DIM", "1024"))
 
+    rag_enabled: bool = _get_bool(os.getenv("RAG_ENABLED"), True)
+    multi_retrieval_enabled: bool = _get_bool(os.getenv("MULTI_RETRIEVAL_ENABLED"), False)
+    multi_retrieval_dense_factor: int = int(os.getenv("MULTI_RETRIEVAL_DENSE_FACTOR", "3"))
+    multi_retrieval_lexical_factor: int = int(os.getenv("MULTI_RETRIEVAL_LEXICAL_FACTOR", "3"))
+    multi_retrieval_rrf_k: int = int(os.getenv("MULTI_RETRIEVAL_RRF_K", "60"))
     rerank_provider: str = os.getenv("RERANK_PROVIDER", "overlap")
+    rerank_enabled: bool = _get_bool(os.getenv("RERANK_ENABLED"), True)
     rerank_endpoint: str | None = os.getenv("RERANK_ENDPOINT")
     rerank_api_key: str | None = os.getenv("RERANK_API_KEY")
     rerank_model: str = os.getenv("RERANK_MODEL", "BAAI/bge-reranker-v2-m3") # 新增
@@ -49,6 +55,13 @@ class Settings:
     rerank_circuit_breaker_seconds: int = int(os.getenv("RERANK_CIRCUIT_BREAKER_SECONDS", "60"))
     rerank_circuit_breaker_failures: int = int(os.getenv("RERANK_CIRCUIT_BREAKER_FAILURES", "1"))
     rerank_vertex_retries: int = int(os.getenv("RERANK_VERTEX_RETRIES", "2"))
+    second_stage_rerank_enabled: bool = _get_bool(os.getenv("SECOND_STAGE_RERANK_ENABLED"), False)
+    second_stage_rerank_model: str = os.getenv(
+        "SECOND_STAGE_RERANK_MODEL",
+        "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
+    )
+    second_stage_rerank_weight: float = float(os.getenv("SECOND_STAGE_RERANK_WEIGHT", "0.35"))
+    second_stage_history_messages: int = int(os.getenv("SECOND_STAGE_HISTORY_MESSAGES", "4"))
 
     llm_provider: str = os.getenv("LLM_PROVIDER", "http")
     llm_endpoint: str | None = os.getenv("LLM_ENDPOINT")

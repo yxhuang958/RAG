@@ -137,6 +137,34 @@ class DocumentStore:
             hydrated.append({**hit, "text": text})
         return hydrated
 
+    def list_user_chunks(self, user_id: str) -> list[dict[str, Any]]:
+        chunks: list[dict[str, Any]] = []
+        with self._lock:
+            documents = self._read()
+            for item in documents.values():
+                if item.get("user_id") != user_id or item.get("status") != "ready":
+                    continue
+
+                doc_id = item.get("doc_id")
+                if not isinstance(doc_id, str):
+                    continue
+
+                filename = item.get("filename")
+                chunk_texts = item.get("chunk_texts") or []
+                for chunk_index, text in enumerate(chunk_texts):
+                    if not isinstance(text, str) or not text.strip():
+                        continue
+                    chunks.append(
+                        {
+                            "user_id": user_id,
+                            "doc_id": doc_id,
+                            "filename": filename,
+                            "chunk_index": chunk_index,
+                            "text": text,
+                        }
+                    )
+        return chunks
+
     def _key(self, user_id: str, content_hash: str) -> str:
         return f"{user_id}:{content_hash}"
 

@@ -180,9 +180,13 @@ def query(payload: QueryRequest) -> dict:
     _log_query_timing("request_parse", start, f"messages={len(messages)} top_k={payload.top_k}")
 
     # 1. 准备 Milvus 集合
-    start = time.perf_counter()
-    collection = get_collection(settings.embedding_dim)
-    _log_query_timing("milvus_prepare", start, f"collection={settings.milvus_collection}")
+    collection = None
+    if settings.rag_enabled:
+        start = time.perf_counter()
+        collection = get_collection(settings.embedding_dim)
+        _log_query_timing("milvus_prepare", start, f"collection={settings.milvus_collection}")
+    else:
+        _log_query_timing("milvus_prepare_skipped", time.perf_counter(), "rag_enabled=false")
 
     # 2. 运行无状态 QA Pipeline (检索 -> 重排 -> 构造 Prompt -> 调用 LLM)
     start = time.perf_counter()

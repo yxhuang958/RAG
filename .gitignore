@@ -9,3 +9,5 @@ dist/
 note.txt
 
 server/data/
+
+tests/rag_tests/
