@@ -11,4 +11,5 @@ note.txt
 server/data/
 
 tests/rag_tests/
-tests/rag_tests_1/
+
+tests/rag_tests_1/data/

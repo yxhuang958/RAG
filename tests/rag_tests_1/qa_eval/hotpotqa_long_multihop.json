@@ -1,0 +1,2137 @@
+[
+  {
+    "id": "5ae164685542997b2ef7d1cb",
+    "type": "bridge",
+    "difficulty": "hard",
+    "question": "Who was the lead character designer on \"Pepper Ann\", and the creator of Cartoon Network's 13th \"Cartoon Cartoons\"?",
+    "reference_answer": "Thomas Warburton",
+    "source_files": [
+      "hotpot/codename_kids_next_door.md",
+      "hotpot/tom_warburton.md"
+    ],
+    "supporting_facts": [
+      {
+        "title": "Codename: Kids Next Door",
+        "sent_id": 0,
+        "sentence": "Codename: Kids Next Door, commonly abbreviated to Kids Next Door or KND, is an American animated television series created by Tom Warburton for Cartoon Network, and the 13th of the network's \"Cartoon Cartoons\"."
+      },
+      {
+        "title": "Tom Warburton",
+        "sent_id": 0,
+        "sentence": "Thomas Warburton (born August 31, 1968), often credited as Mr. Warburton, is an American animator, producer, writer and designer."
+      },
+      {
+        "title": "Tom Warburton",
+        "sent_id": 3,
+        "sentence": " Prior to that he served as production designer on the first season of \"Beavis and Butt-Head\" and was the lead character designer for the animated series \"Pepper Ann\"."
+      }
+    ],
+    "dataset": "HotpotQA distractor dev"
+  },
+  {
+    "id": "5a80762a5542996402f6a536",
+    "type": "bridge",
+    "difficulty": "hard",
+    "question": "What team does the new manager who made considerable changes to the Celtic team for the 2010-11 season head coach for?",
+    "reference_answer": "Scottish Premiership club Hibernian",
+    "source_files": [
+      "hotpot/2010_11_celtic_f_c_season.md",
+      "hotpot/neil_lennon.md"
+    ],
+    "supporting_facts": [
+      {
+        "title": "2010–11 Celtic F.C. season",
+        "sent_id": 0,
+        "sentence": "The 2010–11 season was the 122nd season of competitive football by Celtic."
+      },
+      {
+        "title": "2010–11 Celtic F.C. season",
+        "sent_id": 1,
+        "sentence": " New manager Neil Lennon made considerable changes to the Celtic team for the 2010-11 season."
+      },
+      {
+        "title": "Neil Lennon",
+        "sent_id": 0,
+        "sentence": "Neil Francis Lennon (born 25 June 1971) is a Northern Irish football coach and former player, who is the head coach of Scottish Premiership club Hibernian."
+      }
+    ],
+    "dataset": "HotpotQA distractor dev"
+  },
+  {
+    "id": "5a73977d554299623ed4ac08",
+    "type": "comparison",
+    "difficulty": "hard",
+    "question": "What is the shared country of ancestry between Art Laboe and Scout Tufankjian?",
+    "reference_answer": "Armenian",
+    "source_files": [
+      "hotpot/art_laboe.md",
+      "hotpot/scout_tufankjian.md"
+    ],
+    "supporting_facts": [
+      {
+        "title": "Art Laboe",
+        "sent_id": 0,
+        "sentence": "Art Laboe (born Arthur Egnoian on August 7, 1925) is an Armenian American disc jockey, songwriter, record producer, and radio station owner, generally credited with coining the term \"Oldies But Goodies\"."
+      },
+      {
+        "title": "Scout Tufankjian",
+        "sent_id": 0,
+        "sentence": "Scout Tufankjian is an Armenian-American photojournalist and author based in Brooklyn, New York."
+      }
+    ],
+    "dataset": "HotpotQA distractor dev"
+  },
+  {
+    "id": "5a87e3d65542993e715abff8",
+    "type": "bridge",
+    "difficulty": "hard",
+    "question": "Alfie Allen played Theon Greyjoy on which show?",
+    "reference_answer": "Game of Thrones",
+    "source_files": [
+      "hotpot/alfie_allen.md",
+      "hotpot/theon_greyjoy.md"
+    ],
+    "supporting_facts": [
+      {
+        "title": "Alfie Allen",
+        "sent_id": 0,
+        "sentence": "Alfie Allen (born 12 September 1986) is an English actor."
+      },
+      {
+        "title": "Theon Greyjoy",
+        "sent_id": 0,
+        "sentence": "Theon Greyjoy is a fictional character in the \"A Song of Ice and Fire\" series of fantasy novels by American author George R. R. Martin, and its television adaptation \"Game of Thrones\"."
+      }
+    ],
+    "dataset": "HotpotQA distractor dev"
+  },
+  {
+    "id": "5ac560235542993e66e82396",
+    "type": "comparison",
+    "difficulty": "hard",
+    "question": "Sarah Price and Rob Schneider are both what profession? ",
+    "reference_answer": "director",
+    "source_files": [
+      "hotpot/rob_schneider.md",
+      "hotpot/sarah_price_filmmaker.md"
+    ],
+    "supporting_facts": [
+      {
+        "title": "Sarah Price (filmmaker)",
+        "sent_id": 0,
+        "sentence": "Sarah Price is an American filmmaker, known for the feature documentaries \"American Movie\" (1999 Winner of the Grand Jury Prize for Documentary at the Sundance Film Festival, released by Sony Pictures Classics), \"Caesar's Park\" (2001 SXSW Int'l Film Fest, Sundance Channel), \"The Yes Men\" (2003 Toronto Int'l Film Festival, released by United Artist/MGM), and \"Summercamp!"
+      },
+      {
+        "title": "Rob Schneider",
+        "sent_id": 0,
+        "sentence": "Robert Michael Schneider (born October 31, 1963) is an American actor, comedian, screenwriter, and director."
+      }
+    ],
+    "dataset": "HotpotQA distractor dev"
+  },
+  {
+    "id": "5ae638865542992ae0d1628c",
+    "type": "bridge",
+    "difficulty": "hard",
+    "question": "Who created the 2003 remake of the 1983 overhead view, vehicular combat game developed by Bally Midway?",
+    "reference_answer": "Adam Dawes",
+    "source_files": [
+      "hotpot/highway_pursuit.md",
+      "hotpot/spy_hunter.md"
+    ],
+    "supporting_facts": [
+      {
+        "title": "Highway Pursuit",
+        "sent_id": 0,
+        "sentence": "Highway Pursuit is a computer game remake of Spy Hunter created by Adam Dawes in association with Retrospec, initially released in 2003."
+      },
+      {
+        "title": "Spy Hunter",
+        "sent_id": 0,
+        "sentence": "Spy Hunter is an overhead view, vehicular combat game developed by Bally Midway and released in arcades in 1983."
+      }
+    ],
+    "dataset": "HotpotQA distractor dev"
+  },
+  {
+    "id": "5adef1b35542993a75d263af",
+    "type": "bridge",
+    "difficulty": "hard",
+    "question": "which Mexican and American film actress is Ethel Houbiers  French voice of ",
+    "reference_answer": "Salma Hayek Pinault",
+    "source_files": [
+      "hotpot/ethel_houbiers.md",
+      "hotpot/salma_hayek.md"
+    ],
+    "supporting_facts": [
+      {
+        "title": "Ethel Houbiers",
+        "sent_id": 1,
+        "sentence": " She is the French voice of Penélope Cruz and Salma Hayek."
+      },
+      {
+        "title": "Salma Hayek",
+        "sent_id": 0,
+        "sentence": "Salma Hayek Pinault ( Hayek Jiménez) (born September 2, 1966), known professionally as Salma Hayek, is a Mexican and American film actress, producer, and former model."
+      }
+    ],
+    "dataset": "HotpotQA distractor dev"
+  },
+  {
+    "id": "5ac0d5cf554299294b219026",
+    "type": "bridge",
+    "difficulty": "hard",
+    "question": "An American Werewolf in Paris was a partial sequel to the comedy film starring whom?",
+    "reference_answer": "David Naughton, Jenny Agutter and Griffin Dunne",
+    "source_files": [
+      "hotpot/an_american_werewolf_in_london.md",
+      "hotpot/an_american_werewolf_in_paris.md"
+    ],
+    "supporting_facts": [
+      {
+        "title": "An American Werewolf in Paris",
+        "sent_id": 1,
+        "sentence": " It follows the general concept of, and is a loose sequel to, John Landis' 1981 film \"An American Werewolf in London\"."
+      },
+      {
+        "title": "An American Werewolf in London",
+        "sent_id": 0,
+        "sentence": "An American Werewolf in London is a 1981 horror comedy film written and directed by John Landis and starring David Naughton, Jenny Agutter and Griffin Dunne."
+      }
+    ],
+    "dataset": "HotpotQA distractor dev"
+  },
+  {
+    "id": "5a86ebac55429960ec39b6d6",
+    "type": "bridge",
+    "difficulty": "hard",
+    "question": "Handi-Snacks are a snack food product line sold by what American multinational confectionery, food, and beverage company that is based in Illinois?",
+    "reference_answer": "Mondelez International, Inc.",
+    "source_files": [
+      "hotpot/handi_snacks.md",
+      "hotpot/mondelez_international.md"
+    ],
+    "supporting_facts": [
+      {
+        "title": "Handi-Snacks",
+        "sent_id": 0,
+        "sentence": "Handi-Snacks are a snack food product line sold by Mondelez International."
+      },
+      {
+        "title": "Mondelez International",
+        "sent_id": 0,
+        "sentence": "Mondelez International, Inc., styled Mondelēz ( ), is an American multinational confectionery, food, and beverage company based in Illinois which employs about 107,000 people around the world."
+      }
+    ],
+    "dataset": "HotpotQA distractor dev"
+  },
+  {
+    "id": "5a8e61165542995085b3741a",
+    "type": "bridge",
+    "difficulty": "hard",
+    "question": "What is the architectural distinction of the hotel whose owner and chief developer is Frank Augustus Miller?",
+    "reference_answer": "largest Mission Revival Style building in the United States",
+    "source_files": [
+      "hotpot/frank_augustus_miller.md",
+      "hotpot/the_mission_inn_hotel_amp_spa.md"
+    ],
+    "supporting_facts": [
+      {
+        "title": "Frank Augustus Miller",
+        "sent_id": 0,
+        "sentence": "Frank Augustus Miller (June 30, 1858 – June 17, 1935) was the owner and chief developer of the Mission Inn in Riverside, California, United States, where Frank Augustus Miller Middle School was named after him."
+      },
+      {
+        "title": "The Mission Inn Hotel &amp; Spa",
+        "sent_id": 0,
+        "sentence": "The Mission Inn, now known as The Mission Inn Hotel & Spa, is a historic landmark hotel in downtown Riverside, California."
+      },
+      {
+        "title": "The Mission Inn Hotel &amp; Spa",
+        "sent_id": 1,
+        "sentence": " Although a composite of many architectural styles, it is generally considered the largest Mission Revival Style building in the United States."
+      }
+    ],
+    "dataset": "HotpotQA distractor dev"
+  },
+  {
+    "id": "5ab6bae95542995eadef0086",
+    "type": "bridge",
+    "difficulty": "hard",
+    "question": "Gretchen Gotay graduated from what American public research university that is located approximately 72 miles northeast of Atlanta?",
+    "reference_answer": "The University of Georgia",
+    "source_files": [
+      "hotpot/gretchen_gotay.md",
+      "hotpot/university_of_georgia.md"
+    ],
+    "supporting_facts": [
+      {
+        "title": "Gretchen Gotay",
+        "sent_id": 2,
+        "sentence": " She is a member of Athens Bulldogs Swim Club under her personal coach Harvey Humphries, and a graduate with a master's degree in sports management at the University of Georgia in Athens."
+      },
+      {
+        "title": "University of Georgia",
+        "sent_id": 0,
+        "sentence": "The University of Georgia, also referred to as UGA or simply Georgia, is an American public research university."
+      },
+      {
+        "title": "University of Georgia",
+        "sent_id": 1,
+        "sentence": " Its main 762 acres campus is located in Athens, Georgia, approximately 72 mile northeast of Atlanta."
+      }
+    ],
+    "dataset": "HotpotQA distractor dev"
+  },
+  {
+    "id": "5a84807d554299123d8c2278",
+    "type": "bridge",
+    "difficulty": "hard",
+    "question": "What is the occupation of the father of the actor that plays Will Graham on teh series \"Hannibal\"?",
+    "reference_answer": "Philosophy professor",
+    "source_files": [
+      "hotpot/hugh_dancy.md",
+      "hotpot/oeuf_hannibal.md"
+    ],
+    "supporting_facts": [
+      {
+        "title": "Oeuf (Hannibal)",
+        "sent_id": 2,
+        "sentence": " The series is based on characters and elements appearing in Thomas Harris' novels \"Red Dragon\" and \"Hannibal\", with focus on the relationship between FBI special investigator Will Graham (Hugh Dancy) and Dr. Hannibal Lecter (Mads Mikkelsen), a forensic psychiatrist destined to become Graham's most cunning enemy."
+      },
+      {
+        "title": "Hugh Dancy",
+        "sent_id": 1,
+        "sentence": " He was born in Stoke-on-Trent, Staffordshire, England, to Sarah Ann (Birley), who works in academic publishing, and Jonathan Peter Dancy, a Philosophy professor and writer, on 19th June 1975."
+      }
+    ],
+    "dataset": "HotpotQA distractor dev"
+  },
+  {
+    "id": "5a8aee2c55429970aeb70338",
+    "type": "comparison",
+    "difficulty": "hard",
+    "question": "Are both George Duran and Ara Babajian famous chefs?",
+    "reference_answer": "no",
+    "source_files": [
+      "hotpot/ara_babajian.md",
+      "hotpot/george_duran.md"
+    ],
+    "supporting_facts": [
+      {
+        "title": "George Duran",
+        "sent_id": 0,
+        "sentence": "George Duran (born George Kevork Guldalian on January 13, 1975) is a Venezuelan born American chef and entertainer who is currently a spokesman in commercials for Hunt's tomatoes."
+      },
+      {
+        "title": "Ara Babajian",
+        "sent_id": 0,
+        "sentence": "Ara Babajian (born July 9, 1972) is an American drummer who has been a member of such bands as Leftöver Crack and The Slackers."
+      }
+    ],
+    "dataset": "HotpotQA distractor dev"
+  },
+  {
+    "id": "5a7631cd5542994ccc91870c",
+    "type": "bridge",
+    "difficulty": "hard",
+    "question": "Where is the seminar Jeanne Marie Beaumont directed in 2007-2010 located?",
+    "reference_answer": "Franconia, New Hampshire",
+    "source_files": [
+      "hotpot/jeanne_marie_beaumont.md",
+      "hotpot/the_frost_place.md"
+    ],
+    "supporting_facts": [
+      {
+        "title": "Jeanne Marie Beaumont",
+        "sent_id": 9,
+        "sentence": " She served as the Director of The Frost Place Advanced Seminar from 2007–2010, and serves on the faculty for the Stonecoast MFA Program in Creative Writing."
+      },
+      {
+        "title": "The Frost Place",
+        "sent_id": 0,
+        "sentence": "The Frost Place is a museum and nonprofit educational center for poetry located at Robert Frost's former home in Franconia, New Hampshire, United States."
+      }
+    ],
+    "dataset": "HotpotQA distractor dev"
+  },
+  {
+    "id": "5abdf1fe55429976d4830a31",
+    "type": "bridge",
+    "difficulty": "hard",
+    "question": "Peter Dhao created a websiteto reflect worldwide views. What was the slogan of the site he created ?",
+    "reference_answer": "media for the 65.8 million",
+    "source_files": [
+      "hotpot/peter_daou.md",
+      "hotpot/verrit.md"
+    ],
+    "supporting_facts": [
+      {
+        "title": "Peter Daou",
+        "sent_id": 0,
+        "sentence": "Peter Daou is the creator of Verrit, the prior chief executive of Shareblue, and a member of the band The Daou."
+      },
+      {
+        "title": "Verrit",
+        "sent_id": 0,
+        "sentence": "The website's slogan says it is \"media for the 65.8 million,\" referring to the number of votes Hillary Clinton won in the 2016 presidential election."
+      }
+    ],
+    "dataset": "HotpotQA distractor dev"
+  },
+  {
+    "id": "5a7e052d5542995f4f40238e",
+    "type": "bridge",
+    "difficulty": "hard",
+    "question": "The Joggers are a four-piece band whose lead singer is the son of an American chemist who received the highest what?",
+    "reference_answer": "Hirsch index rating",
+    "source_files": [
+      "hotpot/george_m_whitesides.md",
+      "hotpot/the_joggers.md"
+    ],
+    "supporting_facts": [
+      {
+        "title": "The Joggers",
+        "sent_id": 0,
+        "sentence": "The Joggers, formerly known as Stateside, are a four-piece band from Portland, Oregon."
+      },
+      {
+        "title": "The Joggers",
+        "sent_id": 2,
+        "sentence": " The guitar style of (lead singer and songwriter) Ben Whitesides and the second guitarist rejects a traditional rhythm & lead style for more scale exploration and includes elements of call and response."
+      },
+      {
+        "title": "The Joggers",
+        "sent_id": 6,
+        "sentence": " Ben Whitesides is the son of George M. Whitesides, one of the most decorated and wealthy chemists in the world."
+      },
+      {
+        "title": "George M. Whitesides",
+        "sent_id": 0,
+        "sentence": "George McClelland Whitesides (born August 3, 1939) is an American chemist and professor of chemistry at Harvard University."
+      },
+      {
+        "title": "George M. Whitesides",
+        "sent_id": 2,
+        "sentence": " A prolific author and patent holder who has received many awards, he received the highest Hirsch index rating of all living chemists in 2011."
+      }
+    ],
+    "dataset": "HotpotQA distractor dev"
+  },
+  {
+    "id": "5ab442645542991751b4d70c",
+    "type": "bridge",
+    "difficulty": "hard",
+    "question": "What type of the district is the Downtown Bentonville of the state in the southeastern region of the United States which is home to over 3 million people as of 2017?",
+    "reference_answer": "business district",
+    "source_files": [
+      "hotpot/arkansas.md",
+      "hotpot/downtown_bentonville.md"
+    ],
+    "supporting_facts": [
+      {
+        "title": "Downtown Bentonville",
+        "sent_id": 0,
+        "sentence": "Downtown Bentonville is the historic business district of Bentonville, Arkansas."
+      },
+      {
+        "title": "Arkansas",
+        "sent_id": 0,
+        "sentence": "Arkansas (pronounced ) is a state in the southeastern region of the United States, home to over 3 million people as of 2017."
+      }
+    ],
+    "dataset": "HotpotQA distractor dev"
+  },
+  {
+    "id": "5ae382ee5542992e3233c430",
+    "type": "bridge",
+    "difficulty": "hard",
+    "question": "The Prussian General Carl von Clausewitz is associated with what type of realism?",
+    "reference_answer": "Modern thinkers associated with classical realism are Carl von Clausewitz",
+    "source_files": [
+      "hotpot/carl_von_clausewitz.md",
+      "hotpot/classical_realism_international_relations.md"
+    ],
+    "supporting_facts": [
+      {
+        "title": "Classical realism (international relations)",
+        "sent_id": 2,
+        "sentence": " Modern thinkers associated with classical realism are Carl von Clausewitz, Hans Morgenthau and Reinhold Niebuhr."
+      },
+      {
+        "title": "Carl von Clausewitz",
+        "sent_id": 0,
+        "sentence": "Carl Philipp Gottfried (or Gottlieb) von Clausewitz ( ; 1 June 1780 – 16 November 1831) was a Prussian general and military theorist who stressed the \"moral\" (meaning, in modern terms, psychological) and political aspects of war."
+      }
+    ],
+    "dataset": "HotpotQA distractor dev"
+  },
+  {
+    "id": "5ab53ad6554299488d4d9917",
+    "type": "bridge",
+    "difficulty": "hard",
+    "question": "The Ameican Jazz saxophonist nicked named the \"Hawk\", once played with what musician who died in 2009 and once played with Johnny Carson during Carson's residency?",
+    "reference_answer": "Shep Meyers",
+    "source_files": [
+      "hotpot/coleman_hawkins.md",
+      "hotpot/shep_meyers.md"
+    ],
+    "supporting_facts": [
+      {
+        "title": "Shep Meyers",
+        "sent_id": 0,
+        "sentence": "Shep Meyers (October 5, 1936 - July 18, 2009) was an American pianist, composer, arranger, and conductor."
+      },
+      {
+        "title": "Shep Meyers",
+        "sent_id": 5,
+        "sentence": " He served as conductor for the bands of comedians Lenny Bruce, Steve Allen, Redd Foxx, Henny Youngman, and Johnny Carson during his residency at the Sahara Hotel in Las Vegas."
+      },
+      {
+        "title": "Shep Meyers",
+        "sent_id": 6,
+        "sentence": " He has played with Woody Herman, Coleman Hawkins, Art Pepper, Conte Candoli, and Don Joham."
+      },
+      {
+        "title": "Coleman Hawkins",
+        "sent_id": 0,
+        "sentence": "Coleman Randolph Hawkins (November 21, 1904 – May 19, 1969), nicknamed Hawk and sometimes \"Bean\", was an American jazz tenor saxophonist."
+      }
+    ],
+    "dataset": "HotpotQA distractor dev"
+  },
+  {
+    "id": "5a75f32055429976ec32bcb7",
+    "type": "bridge",
+    "difficulty": "hard",
+    "question": "This actor born August 26, 1909 stared in the tv show \" The Cowboys \".",
+    "reference_answer": "Jim Davis",
+    "source_files": [
+      "hotpot/jim_davis_actor.md",
+      "hotpot/the_cowboys_tv_series.md"
+    ],
+    "supporting_facts": [
+      {
+        "title": "The Cowboys (TV series)",
+        "sent_id": 2,
+        "sentence": " The television show starred Jim Davis, Diana Douglas, Moses Gunn, A Martinez, Robert Carradine, and Clay O'Brien."
+      },
+      {
+        "title": "Jim Davis (actor)",
+        "sent_id": 0,
+        "sentence": "Jim Davis (August 26, 1909 – April 26, 1981) was an American actor, best known for his role as Jock Ewing in the CBS prime-time soap opera, \"Dallas\", a role which continued until he was too ill from a terminal illness to perform."
+      }
+    ],
+    "dataset": "HotpotQA distractor dev"
+  },
+  {
+    "id": "5a8a764555429930ff3c0de1",
+    "type": "bridge",
+    "difficulty": "hard",
+    "question": "What distinction about his birth makes the contemporary of Bill Pollack unique as a winner of the Formula One World Drivers' Championship?",
+    "reference_answer": "American-born",
+    "source_files": [
+      "hotpot/bill_pollack.md",
+      "hotpot/phil_hill.md"
+    ],
+    "supporting_facts": [
+      {
+        "title": "Bill Pollack",
+        "sent_id": 0,
+        "sentence": "Bill Pollack was a competitor in the early days of the post World War II California sports car culture."
+      },
+      {
+        "title": "Bill Pollack",
+        "sent_id": 3,
+        "sentence": " He was a contemporary of Phil Hill, who went on to become the first and only U.S. born world grand prix champion."
+      },
+      {
+        "title": "Phil Hill",
+        "sent_id": 0,
+        "sentence": "Philip Toll Hill Jr. (April 20, 1927 – August 28, 2008) was an American automobile racer and the only American-born driver to win the Formula One World Drivers' Championship (Mario Andretti, an Italian American driver, won the World Drivers' Championship in 1978, but was not born in the United States)."
+      }
+    ],
+    "dataset": "HotpotQA distractor dev"
+  },
+  {
+    "id": "5adbd70c55429947ff173843",
+    "type": "bridge",
+    "difficulty": "hard",
+    "question": " What is the title of the memoir written by the honoree of the Black and White Ball?",
+    "reference_answer": "Personal History",
+    "source_files": [
+      "hotpot/black_and_white_ball.md",
+      "hotpot/katharine_graham.md"
+    ],
+    "supporting_facts": [
+      {
+        "title": "Black and White Ball",
+        "sent_id": 0,
+        "sentence": "The Black and White Ball was a masquerade ball held on November 28, 1966 at the Plaza Hotel in New York City."
+      },
+      {
+        "title": "Black and White Ball",
+        "sent_id": 1,
+        "sentence": " Hosted by author Truman Capote, the ball was in honor of \"The Washington Post\" publisher Katharine Graham."
+      },
+      {
+        "title": "Katharine Graham",
+        "sent_id": 0,
+        "sentence": "Katharine Meyer Graham (June 16, 1917 – July 17, 2001) was an American publisher."
+      },
+      {
+        "title": "Katharine Graham",
+        "sent_id": 2,
+        "sentence": " Her memoir, \"Personal History\", won the Pulitzer Prize in 1998."
+      }
+    ],
+    "dataset": "HotpotQA distractor dev"
+  },
+  {
+    "id": "5a89a02955429946c8d6e975",
+    "type": "comparison",
+    "difficulty": "hard",
+    "question": "Which was released first, The Climb or Voices of Iraq?",
+    "reference_answer": "Voices of Iraq",
+    "source_files": [
+      "hotpot/the_climb_2007_film.md",
+      "hotpot/voices_of_iraq.md"
+    ],
+    "supporting_facts": [
+      {
+        "title": "The Climb (2007 film)",
+        "sent_id": 0,
+        "sentence": "The Climb is a 2007 documentary of Laurie Skreslet's return to Mount Everest after twenty-five years."
+      },
+      {
+        "title": "Voices of Iraq",
+        "sent_id": 0,
+        "sentence": "Voices of Iraq is a 2004 documentary film about Iraq, created by distributing cameras to the subjects of a film, thus enabling subjects to film themselves."
+      }
+    ],
+    "dataset": "HotpotQA distractor dev"
+  },
+  {
+    "id": "5a866fed554299211dda2b2e",
+    "type": "bridge",
+    "difficulty": "hard",
+    "question": "Psycho-physical Awareness was developed into an original and dependable method by a Russian-American actor who was referred to by Konstantin Stanislavski as what?",
+    "reference_answer": "his most brilliant student",
+    "source_files": [
+      "hotpot/michael_chekhov.md",
+      "hotpot/psycho_physical_awareness.md"
+    ],
+    "supporting_facts": [
+      {
+        "title": "Psycho-physical Awareness",
+        "sent_id": 0,
+        "sentence": "Psycho-physical Awareness is a popular acting technique used in many schools and universities in the U.S. and Europe."
+      },
+      {
+        "title": "Psycho-physical Awareness",
+        "sent_id": 3,
+        "sentence": " The pioneer of this technique is Constantin Stanislavski who sought to overcome the divisions between “mind from body, knowledge from feeling, analysis from action” through psychophysical training or the method of physical action, but it was Michael Chekhov who further developed an original and dependable method of what we now know to be psycho-physical awareness."
+      },
+      {
+        "title": "Michael Chekhov",
+        "sent_id": 0,
+        "sentence": "Mikhail Aleksandrovich \"Michael\" Chekhov (Russian: Михаил Александрович Чехов , 29 August 1891 – 30 September 1955) was a Russian-American actor, director, author, and theatre practitioner."
+      },
+      {
+        "title": "Michael Chekhov",
+        "sent_id": 2,
+        "sentence": " Konstantin Stanislavski referred to him as his most brilliant student."
+      }
+    ],
+    "dataset": "HotpotQA distractor dev"
+  },
+  {
+    "id": "5ab85a1155429934fafe6d7c",
+    "type": "comparison",
+    "difficulty": "hard",
+    "question": "Are both Rutgers University and Carnegie Mellon University located in America?",
+    "reference_answer": "yes",
+    "source_files": [
+      "hotpot/carnegie_mellon_university.md",
+      "hotpot/rutgers_university.md"
+    ],
+    "supporting_facts": [
+      {
+        "title": "Rutgers University",
+        "sent_id": 0,
+        "sentence": "Rutgers, The State University of New Jersey ( ), commonly referred to as Rutgers University, Rutgers, or RU, is an American public research university and the largest institution for higher education in New Jersey."
+      },
+      {
+        "title": "Carnegie Mellon University",
+        "sent_id": 0,
+        "sentence": "Carnegie Mellon University (Carnegie Mellon or CMU or ) is a private research university in Pittsburgh, Pennsylvania."
+      }
+    ],
+    "dataset": "HotpotQA distractor dev"
+  },
+  {
+    "id": "5ac01bb8554299012d1db5a6",
+    "type": "bridge",
+    "difficulty": "hard",
+    "question": "Which American character actor who starred on the television series \"Stargate SG-1\" (1997–2007) and appeared in \"Episode 8\" of \"Twin Peaks\" as a guest star?",
+    "reference_answer": "Don S. Davis",
+    "source_files": [
+      "hotpot/don_s_davis.md",
+      "hotpot/episode_8_twin_peaks.md"
+    ],
+    "supporting_facts": [
+      {
+        "title": "Episode 8 (Twin Peaks)",
+        "sent_id": 0,
+        "sentence": "\"Episode 8\", also known as \"May the Giant Be with You\", is the first episode of the second season of the American mystery television series \"Twin Peaks\"."
+      },
+      {
+        "title": "Episode 8 (Twin Peaks)",
+        "sent_id": 2,
+        "sentence": " It features series regulars Kyle MacLachlan, Michael Ontkean, Ray Wise and Richard Beymer; and guest stars Grace Zabriskie as Sarah Palmer, Chris Mulkey as Hank Jennings, Miguel Ferrer as Albert Rosenfield, Don S. Davis as Major Garland Briggs, and Victoria Catlin as Blackie O'Reilly."
+      },
+      {
+        "title": "Don S. Davis",
+        "sent_id": 0,
+        "sentence": "Don Sinclair Davis, PhD (August 4, 1942 – June 29, 2008) was an American character actor best-known for playing General Hammond in the television series \"Stargate SG-1\" (1997–2007), and earlier for playing Major Garland Briggs on the television series \"Twin Peaks\" (1990–1991)."
+      }
+    ],
+    "dataset": "HotpotQA distractor dev"
+  },
+  {
+    "id": "5adefdd75542995ec70e8f4e",
+    "type": "bridge",
+    "difficulty": "hard",
+    "question": "How many times has the team Jack McKeon managed won the World Series?",
+    "reference_answer": "two World Series championships",
+    "source_files": [
+      "hotpot/jim_tracy_baseball.md",
+      "hotpot/miami_marlins.md"
+    ],
+    "supporting_facts": [
+      {
+        "title": "Jim Tracy (baseball)",
+        "sent_id": 2,
+        "sentence": " Tracy was named Manager of the Year in 2009, only the second manager to win the award after being hired mid-season, joining Jack McKeon for the Florida Marlins."
+      },
+      {
+        "title": "Miami Marlins",
+        "sent_id": 3,
+        "sentence": " Though one of only two MLB franchises to have never won a division title (the other is the Colorado Rockies), the Marlins have won two World Series championships as a wild card team."
+      }
+    ],
+    "dataset": "HotpotQA distractor dev"
+  },
+  {
+    "id": "5a79311755429970f5fffe67",
+    "type": "bridge",
+    "difficulty": "hard",
+    "question": "A Japanese manga series based on a 16 year old high school student Ichitaka Seto, is written and illustrated by someone born in what year?",
+    "reference_answer": "1962",
+    "source_files": [
+      "hotpot/i_quot_s.md",
+      "hotpot/masakazu_katsura.md"
+    ],
+    "supporting_facts": [
+      {
+        "title": "Masakazu Katsura",
+        "sent_id": 0,
+        "sentence": "Masakazu Katsura (桂 正和 , Katsura Masakazu , born December 10, 1962) is a Japanese manga artist, known for several works of manga, including \"Wing-man\", \"Shadow Lady\", \"DNA²\", \"Video Girl Ai\", \"I\"s\", and \"Zetman\"."
+      },
+      {
+        "title": "I&quot;s",
+        "sent_id": 1,
+        "sentence": " The story's main character is 16-year-old high school student Ichitaka Seto who is in love with his classmate Iori Yoshizuki, but too shy to tell her."
+      }
+    ],
+    "dataset": "HotpotQA distractor dev"
+  },
+  {
+    "id": "5ae54eea5542993aec5ec19d",
+    "type": "comparison",
+    "difficulty": "hard",
+    "question": "Which band was formed first, Wavves or Social Code?",
+    "reference_answer": "Social Code",
+    "source_files": [
+      "hotpot/social_code.md",
+      "hotpot/wavves.md"
+    ],
+    "supporting_facts": [
+      {
+        "title": "Wavves",
+        "sent_id": 1,
+        "sentence": " Formed in 2008 by singer-songwriter Nathan Williams (born June 12, 1986), the band also features Alex Gates (guitar, backing vocals), Stephen Pope (bass guitar, backing vocals) and Brian Hill (drums and backing vocals)."
+      },
+      {
+        "title": "Social Code",
+        "sent_id": 0,
+        "sentence": "Social Code (formerly known as Fifth Season) was a Canadian alternative rock group formed in 1999 in St. Albert."
+      }
+    ],
+    "dataset": "HotpotQA distractor dev"
+  },
+  {
+    "id": "5ac1b8ee5542994d76dccedc",
+    "type": "comparison",
+    "difficulty": "hard",
+    "question": "Which filmmaker was known for animation, Lev Yilmaz or Pamela B. Green?",
+    "reference_answer": "Levni Yilmaz",
+    "source_files": [
+      "hotpot/lev_yilmaz.md",
+      "hotpot/pamela_b_green.md"
+    ],
+    "supporting_facts": [
+      {
+        "title": "Lev Yilmaz",
+        "sent_id": 0,
+        "sentence": "Levni Yilmaz (born 1973) is a San Francisco based independent film maker, artist and publisher, best known for his “Tales of Mere Existence” animated comic series."
+      },
+      {
+        "title": "Pamela B. Green",
+        "sent_id": 0,
+        "sentence": "Pamela B. Green is an American film producer and director known for her work in feature film titles and motion graphics."
+      }
+    ],
+    "dataset": "HotpotQA distractor dev"
+  },
+  {
+    "id": "5a76a0005542993569682c64",
+    "type": "comparison",
+    "difficulty": "hard",
+    "question": "Which American film director is an advisor for Disney, Rick Ray or John Lasseter?",
+    "reference_answer": "John Alan Lasseter",
+    "source_files": [
+      "hotpot/john_lasseter.md",
+      "hotpot/rick_ray.md"
+    ],
+    "supporting_facts": [
+      {
+        "title": "Rick Ray",
+        "sent_id": 0,
+        "sentence": "Rick Ray is an American filmmaker best known for his 2006 documentary film 10 Questions for the Dalai Lama which he wrote, filmed and directed."
+      },
+      {
+        "title": "John Lasseter",
+        "sent_id": 0,
+        "sentence": "John Alan Lasseter (born January 12, 1957) is an American animator, film director, screenwriter, and film producer."
+      },
+      {
+        "title": "John Lasseter",
+        "sent_id": 2,
+        "sentence": " He is also the Principal Creative Advisor for Walt Disney Imagineering."
+      }
+    ],
+    "dataset": "HotpotQA distractor dev"
+  },
+  {
+    "id": "5adf2fa35542993344016c11",
+    "type": "comparison",
+    "difficulty": "hard",
+    "question": "Which of Jonny Craig and Pete Doherty has been a member of more bands ?",
+    "reference_answer": "Jonny\" Craig",
+    "source_files": [
+      "hotpot/jonny_craig.md",
+      "hotpot/pete_doherty.md"
+    ],
+    "supporting_facts": [
+      {
+        "title": "Jonny Craig",
+        "sent_id": 0,
+        "sentence": "Jonathan Monroe \"Jonny\" Craig (born March 26, 1986) is a Canadian-American singer and songwriter."
+      },
+      {
+        "title": "Jonny Craig",
+        "sent_id": 2,
+        "sentence": " He has been the lead vocalist for the bands Dance Gavin Dance, Emarosa, Ghost Runner on Third, Slaves, and westerHALTS."
+      },
+      {
+        "title": "Pete Doherty",
+        "sent_id": 1,
+        "sentence": " He is best known for being co-frontman of the Libertines, which he formed with Carl Barât in 1997."
+      },
+      {
+        "title": "Pete Doherty",
+        "sent_id": 2,
+        "sentence": " His other musical projects are indie band Babyshambles and Peter Doherty and the Puta Madres."
+      }
+    ],
+    "dataset": "HotpotQA distractor dev"
+  },
+  {
+    "id": "5ae07b0155429945ae95935d",
+    "type": "comparison",
+    "difficulty": "hard",
+    "question": "Which novelist was German, David Guterson or Thomas Mann?",
+    "reference_answer": "Paul Thomas Mann",
+    "source_files": [
+      "hotpot/david_guterson.md",
+      "hotpot/thomas_mann.md"
+    ],
+    "supporting_facts": [
+      {
+        "title": "David Guterson",
+        "sent_id": 0,
+        "sentence": "David Guterson ( ; born May 4, 1956) is an American novelist, short story writer, poet, journalist, and essayist."
+      },
+      {
+        "title": "Thomas Mann",
+        "sent_id": 0,
+        "sentence": "Paul Thomas Mann (] ; 6 June 1875 – 12 August 1955) was a German novelist, short story writer, social critic, philanthropist, essayist, and the 1929 Nobel Prize in Literature laureate."
+      }
+    ],
+    "dataset": "HotpotQA distractor dev"
+  },
+  {
+    "id": "5a8eb51655429917b4a5bdb5",
+    "type": "bridge",
+    "difficulty": "hard",
+    "question": "What type of arts that have existed since ancient times did the Stieber Twins specialize in?",
+    "reference_answer": "Graffiti",
+    "source_files": [
+      "hotpot/graffiti.md",
+      "hotpot/stieber_twins.md"
+    ],
+    "supporting_facts": [
+      {
+        "title": "Stieber Twins",
+        "sent_id": 1,
+        "sentence": " They are known as graffiti artists, breakdancers, rappers, hip hop producers and DJs."
+      },
+      {
+        "title": "Graffiti",
+        "sent_id": 1,
+        "sentence": " Graffiti range from simple written words to elaborate wall paintings, and they have existed since ancient times, with examples dating back to Ancient Egypt, Ancient Greece, and the Roman Empire."
+      }
+    ],
+    "dataset": "HotpotQA distractor dev"
+  },
+  {
+    "id": "5adcceda5542990d50227d31",
+    "type": "comparison",
+    "difficulty": "hard",
+    "question": "George Gershwin is an American Composer and Judith Weir is a composer from which country?",
+    "reference_answer": "a British composer",
+    "source_files": [
+      "hotpot/george_gershwin.md",
+      "hotpot/judith_weir.md"
+    ],
+    "supporting_facts": [
+      {
+        "title": "Judith Weir",
+        "sent_id": 0,
+        "sentence": "Judith Weir {'1': \", '2': \", '3': \", '4': \"} (born 11 May 1954) is a British composer and Master of the Queen's Music."
+      },
+      {
+        "title": "George Gershwin",
+        "sent_id": 0,
+        "sentence": "George Jacob Gershwin ( ; September 26, 1898 July 11, 1937) was an American composer and pianist."
+      }
+    ],
+    "dataset": "HotpotQA distractor dev"
+  },
+  {
+    "id": "5a7f5ab65542995d8a8dde43",
+    "type": "bridge",
+    "difficulty": "hard",
+    "question": "Cheek to cheek tour played shows at what place that is located on the Las Vegas strip that began their tour?",
+    "reference_answer": "Cosmopolitan of Las Vegas",
+    "source_files": [
+      "hotpot/cheek_to_cheek_tour.md",
+      "hotpot/cosmopolitan_of_las_vegas.md"
+    ],
+    "supporting_facts": [
+      {
+        "title": "Cheek to Cheek Tour",
+        "sent_id": 1,
+        "sentence": " The tour, which began with a two-night run at The Cosmopolitan in Las Vegas, played a total of 36 shows across Europe and North America during the first half of 2015."
+      },
+      {
+        "title": "Cosmopolitan of Las Vegas",
+        "sent_id": 0,
+        "sentence": "The Cosmopolitan of Las Vegas (commonly referred to simply as The Cosmopolitan or The Cosmo) is a luxury resort casino and hotel on the Las Vegas Strip in Paradise, Nevada."
+      }
+    ],
+    "dataset": "HotpotQA distractor dev"
+  },
+  {
+    "id": "5a8d50fb55429941ae14dfa2",
+    "type": "bridge",
+    "difficulty": "hard",
+    "question": "The Bodie & Benton Railway was a narrow gauge common carrier railroad in California, from the Mono Mills to a terminus in a ghost town located how many miles away from Lake Tahoe ?",
+    "reference_answer": "75 mi",
+    "source_files": [
+      "hotpot/bodie_and_benton_railway_and_commercial_company.md",
+      "hotpot/bodie_california.md"
+    ],
+    "supporting_facts": [
+      {
+        "title": "Bodie and Benton Railway and Commercial Company",
+        "sent_id": 0,
+        "sentence": "The Bodie & Benton Railway was a narrow gauge common carrier railroad in California, from the Mono Mills to a terminus in Bodie, now a ghost town, in Mono County."
+      },
+      {
+        "title": "Bodie, California",
+        "sent_id": 0,
+        "sentence": "Bodie ( ) is a ghost town in the Bodie Hills east of the Sierra Nevada mountain range in Mono County, California, United States, about 75 mi southeast of Lake Tahoe."
+      }
+    ],
+    "dataset": "HotpotQA distractor dev"
+  },
+  {
+    "id": "5a8ee6145542990e94052bab",
+    "type": "bridge",
+    "difficulty": "hard",
+    "question": "Who built the diesel railcars operated by the publicly owned corporation that provided suburban train, tram and bus services in Adelaide, South Australia starting in July 1994?",
+    "reference_answer": "Comeng and Clyde Engineering",
+    "source_files": [
+      "hotpot/3000_class_railcar.md",
+      "hotpot/transadelaide.md"
+    ],
+    "supporting_facts": [
+      {
+        "title": "3000 class railcar",
+        "sent_id": 0,
+        "sentence": "The 3000/3100 class are a class of diesel railcars operated by Adelaide Metro (and its predecessors STA and TransAdelaide)."
+      },
+      {
+        "title": "3000 class railcar",
+        "sent_id": 1,
+        "sentence": " They were built by Comeng and Clyde Engineering, all in Dandenong, between 1987 and 1996."
+      },
+      {
+        "title": "TransAdelaide",
+        "sent_id": 0,
+        "sentence": "TransAdelaide was a publicly owned corporation established on 4 July 1994 which provided suburban train, tram and bus services in Adelaide, South Australia, under contract to the Government of South Australia."
+      }
+    ],
+    "dataset": "HotpotQA distractor dev"
+  },
+  {
+    "id": "5ab207f65542993be8fa98b8",
+    "type": "bridge",
+    "difficulty": "hard",
+    "question": "Edmund Robert Harris is the principal benefactor of a museum located where ?",
+    "reference_answer": "Preston",
+    "source_files": [
+      "hotpot/edmund_robert_harris.md",
+      "hotpot/harris_museum.md"
+    ],
+    "supporting_facts": [
+      {
+        "title": "Edmund Robert Harris",
+        "sent_id": 0,
+        "sentence": "Edmund Robert Harris (c. 1804 – 27 May 1877) was an English lawyer from Preston, Lancashire, UK who was the principal benefactor of the Harris Museum, Harris Institute or Art School, Harris Technical School and the Harris Orphanage."
+      },
+      {
+        "title": "Harris Museum",
+        "sent_id": 0,
+        "sentence": "The Harris Museum, Art Gallery & Preston Free Public Library is a Grade I listed museum building in Preston."
+      }
+    ],
+    "dataset": "HotpotQA distractor dev"
+  },
+  {
+    "id": "5adf34d35542993a75d26425",
+    "type": "bridge",
+    "difficulty": "hard",
+    "question": "Who was the president of the Sinn Fein political party during the Hume-Adams Dialogue?",
+    "reference_answer": "Gerard \"Gerry\" Adams",
+    "source_files": [
+      "hotpot/gerry_adams.md",
+      "hotpot/hume_adams_dialogue.md"
+    ],
+    "supporting_facts": [
+      {
+        "title": "Hume–Adams dialogue",
+        "sent_id": 0,
+        "sentence": "The Hume–Adams dialogue was a series of talks between then Social Democratic and Labour Party leader John Hume and Sinn Féin leader Gerry Adams during the Northern Ireland peace process."
+      },
+      {
+        "title": "Gerry Adams",
+        "sent_id": 0,
+        "sentence": "Gerard \"Gerry\" Adams (Irish: \"Gearóid Mac Ádhaimh\" ; born 6 October 1948) is an Irish republican politician who is the president of the Sinn Féin political party and a Teachta Dála (TD; a member of the Irish parliament) for Louth since the 2011 general election."
+      }
+    ],
+    "dataset": "HotpotQA distractor dev"
+  },
+  {
+    "id": "5ae5be475542990ba0bbb2c6",
+    "type": "bridge",
+    "difficulty": "hard",
+    "question": "Which ground force of the Austro-Hungarian Dual Monarchy did Jan Romer joined ",
+    "reference_answer": "The Austro-Hungarian Army",
+    "source_files": [
+      "hotpot/austro_hungarian_army.md",
+      "hotpot/jan_romer.md"
+    ],
+    "supporting_facts": [
+      {
+        "title": "Jan Romer",
+        "sent_id": 1,
+        "sentence": " Studied in Mödling and joined the Austro-Hungarian Army."
+      },
+      {
+        "title": "Austro-Hungarian Army",
+        "sent_id": 0,
+        "sentence": "The Austro-Hungarian Army (German: \"Landstreitkräfte Österreich-Ungarns\" ; Hungarian: \"Császári és Királyi Hadsereg\" ) was the ground force of the Austro-Hungarian Dual Monarchy from 1867 to 1918."
+      }
+    ],
+    "dataset": "HotpotQA distractor dev"
+  },
+  {
+    "id": "5a7f57a45542992097ad2f29",
+    "type": "bridge",
+    "difficulty": "hard",
+    "question": "What party was Johan Henrik Deuntzer a part of before the party that translates to the \"Radical Left?\"",
+    "reference_answer": "Liberal \"Venstre\" party",
+    "source_files": [
+      "hotpot/danish_social_liberal_party.md",
+      "hotpot/johan_henrik_deuntzer.md"
+    ],
+    "supporting_facts": [
+      {
+        "title": "Johan Henrik Deuntzer",
+        "sent_id": 0,
+        "sentence": "Johan Henrik Deuntzer (20 May 1845 – 16 November 1918) was a Danish politician, member of the Liberal \"Venstre\" party until 1905 where he joined the Danish Social Liberal Party."
+      },
+      {
+        "title": "Danish Social Liberal Party",
+        "sent_id": 0,
+        "sentence": "The Danish Social Liberal Party (Danish: \"Radikale Venstre\" , \"Radical Left\", i.e. \"Radical Liberal Party\") is a social-liberal political party in Denmark."
+      }
+    ],
+    "dataset": "HotpotQA distractor dev"
+  },
+  {
+    "id": "5abe2b0155429976d4830a83",
+    "type": "bridge",
+    "difficulty": "hard",
+    "question": "Max Hoffmann along with Hindenburg and Ludendorff, masterminded the devastating defeat of the Russian armies in a battle fought when ?",
+    "reference_answer": "26–30 August 1914",
+    "source_files": [
+      "hotpot/battle_of_tannenberg.md",
+      "hotpot/max_hoffmann.md"
+    ],
+    "supporting_facts": [
+      {
+        "title": "Max Hoffmann",
+        "sent_id": 2,
+        "sentence": " Hoffmann, along with Hindenburg and Ludendorff, masterminded the devastating defeat of the Russian armies at Tannenberg and the Masurian Lakes."
+      },
+      {
+        "title": "Battle of Tannenberg",
+        "sent_id": 0,
+        "sentence": "The Battle of Tannenberg was fought between Russia and Germany from 26–30 August 1914, during the first month of World War I."
+      }
+    ],
+    "dataset": "HotpotQA distractor dev"
+  },
+  {
+    "id": "5a86399e5542994775f60733",
+    "type": "bridge",
+    "difficulty": "hard",
+    "question": "Jihad: A Story of the Others is a documentary by the director who is of what descent?",
+    "reference_answer": "Punjabi/Pashtun",
+    "source_files": [
+      "hotpot/deeyah_khan.md",
+      "hotpot/jihad_a_story_of_the_others.md"
+    ],
+    "supporting_facts": [
+      {
+        "title": "Jihad: A Story of the Others",
+        "sent_id": 0,
+        "sentence": "JIHAD: a story of the others is a 2015 documentary film by Emmy and Peabody Award winning Norwegian director Deeyah Khan."
+      },
+      {
+        "title": "Deeyah Khan",
+        "sent_id": 0,
+        "sentence": "Deeyah Khan (Urdu: ‎ , ] , born 7 August 1977 in Oslo, Norway), is a Norwegian film director and human rights defender of Punjabi/Pashtun descent."
+      }
+    ],
+    "dataset": "HotpotQA distractor dev"
+  },
+  {
+    "id": "5a7306a655429901807daf67",
+    "type": "bridge",
+    "difficulty": "hard",
+    "question": "Who is prime minister of this West African country that covers 36125km2?",
+    "reference_answer": "Umaro Mokhtar Sissoco Embaló",
+    "source_files": [
+      "hotpot/guinea_bissau.md",
+      "hotpot/umaro_sissoco_embal.md"
+    ],
+    "supporting_facts": [
+      {
+        "title": "Umaro Sissoco Embaló",
+        "sent_id": 0,
+        "sentence": "Umaro Mokhtar Sissoco Embaló (born 23 September 1972) has been the Prime Minister of Guinea-Bissau since 18 November 2016."
+      },
+      {
+        "title": "Guinea-Bissau",
+        "sent_id": 0,
+        "sentence": "Guinea-Bissau ( ), officially the Republic of Guinea-Bissau (Portuguese: \"República da Guiné-Bissau\" , ] ), is a country in West Africa."
+      },
+      {
+        "title": "Guinea-Bissau",
+        "sent_id": 1,
+        "sentence": " It covers 36125 km2 with an estimated population of ."
+      }
+    ],
+    "dataset": "HotpotQA distractor dev"
+  },
+  {
+    "id": "5ae531ee5542990ba0bbb1ff",
+    "type": "bridge",
+    "difficulty": "hard",
+    "question": "Tommy's Honour was a drama film that included the actor who found success with what 2016 BBC miniseries?",
+    "reference_answer": "War & Peace",
+    "source_files": [
+      "hotpot/jack_lowden.md",
+      "hotpot/tommy_s_honour.md"
+    ],
+    "supporting_facts": [
+      {
+        "title": "Tommy's Honour",
+        "sent_id": 1,
+        "sentence": " The film is directed by Jason Connery, and the father and son are portrayed by Peter Mullan and Jack Lowden."
+      },
+      {
+        "title": "Jack Lowden",
+        "sent_id": 0,
+        "sentence": "Jack Andrew Lowden (born 2 June 1990) is a Scottish stage, television, and film actor."
+      },
+      {
+        "title": "Jack Lowden",
+        "sent_id": 1,
+        "sentence": " Following a highly successful and award-winning four-year stage career, his first major international onscreen success was in the 2016 BBC miniseries \"War & Peace\", which led to starring roles in feature films."
+      }
+    ],
+    "dataset": "HotpotQA distractor dev"
+  },
+  {
+    "id": "5ac538025542996feb3fea41",
+    "type": "bridge",
+    "difficulty": "hard",
+    "question": "Where's Officer Tuba? is a comedy film that stars which Hong Kong-based actress?",
+    "reference_answer": "Joey Wong Cho-Yee",
+    "source_files": [
+      "hotpot/joey_wong.md",
+      "hotpot/where_s_officer_tuba.md"
+    ],
+    "supporting_facts": [
+      {
+        "title": "Where's Officer Tuba?",
+        "sent_id": 1,
+        "sentence": " is a 1986 Hong Kong action comedy film directed by Philip Chan and Ricky Lau and starring Sammo Hung, David Chiang, Jacky Cheung and Joey Wong."
+      },
+      {
+        "title": "Joey Wong",
+        "sent_id": 0,
+        "sentence": "Joey Wong Cho-Yee (AKA Joey Wang, Wang Tsu Hsien, or Joey Ong Jyo Han/Hen) (, born January 31, 1967) is a Hong Kong based Taiwanese-born actress."
+      }
+    ],
+    "dataset": "HotpotQA distractor dev"
+  },
+  {
+    "id": "5ae544d75542990ba0bbb249",
+    "type": "bridge",
+    "difficulty": "hard",
+    "question": " Arena Essex Raceway is built alongside an out-of-town shopping centre constructed on the site of a former what?",
+    "reference_answer": "chalk quarry",
+    "source_files": [
+      "hotpot/arena_essex_raceway.md",
+      "hotpot/lakeside_shopping_centre.md"
+    ],
+    "supporting_facts": [
+      {
+        "title": "Arena Essex Raceway",
+        "sent_id": 0,
+        "sentence": "Arena Essex Raceway is a stock car and speedway racing track located near Purfleet, Essex."
+      },
+      {
+        "title": "Arena Essex Raceway",
+        "sent_id": 1,
+        "sentence": " The Lakeside Shopping Centre was built alongside the venue."
+      },
+      {
+        "title": "Lakeside Shopping Centre",
+        "sent_id": 0,
+        "sentence": "Lakeside Shopping Centre, branded as Intu Lakeside, is a large out-of-town shopping centre located in West Thurrock, in the borough of Thurrock, Essex just beyond the eastern boundary of Greater London."
+      },
+      {
+        "title": "Lakeside Shopping Centre",
+        "sent_id": 1,
+        "sentence": " It was constructed on the site of a former chalk quarry."
+      }
+    ],
+    "dataset": "HotpotQA distractor dev"
+  },
+  {
+    "id": "5ae4a2e25542996836b02cee",
+    "type": "bridge",
+    "difficulty": "hard",
+    "question": "The county that the community of Milltown, Montana is part of was founded in which year?",
+    "reference_answer": "1860",
+    "source_files": [
+      "hotpot/milltown_montana.md",
+      "hotpot/missoula_county_montana.md"
+    ],
+    "supporting_facts": [
+      {
+        "title": "Milltown, Montana",
+        "sent_id": 0,
+        "sentence": "Milltown is an unincorporated community in Missoula County, Montana, United States."
+      },
+      {
+        "title": "Missoula County, Montana",
+        "sent_id": 0,
+        "sentence": "Missoula County is a county in the State of Montana."
+      },
+      {
+        "title": "Missoula County, Montana",
+        "sent_id": 3,
+        "sentence": " The county was founded in 1860."
+      }
+    ],
+    "dataset": "HotpotQA distractor dev"
+  },
+  {
+    "id": "5adfb60655429942ec259b08",
+    "type": "bridge",
+    "difficulty": "hard",
+    "question": "Matilda of Chester, Countess of Huntingdon's father was the son of which woman?",
+    "reference_answer": "Maud of Gloucester",
+    "source_files": [
+      "hotpot/hugh_de_kevelioc_5th_earl_of_chester.md",
+      "hotpot/matilda_of_chester_countess_of_huntingdon.md"
+    ],
+    "supporting_facts": [
+      {
+        "title": "Matilda of Chester, Countess of Huntingdon",
+        "sent_id": 1,
+        "sentence": " She was a daughter of Hugh de Kevelioc, 5th Earl of Chester, and the wife of David of Scotland, Earl of Huntingdon."
+      },
+      {
+        "title": "Hugh de Kevelioc, 5th Earl of Chester",
+        "sent_id": 0,
+        "sentence": "Hugh de Kevelioc, 5th Earl of Chester (1147 – 30 June 1181) was the son of Ranulf de Gernon, 4th Earl of Chester and Maud of Gloucester, daughter of Robert, 1st Earl of Gloucester (otherwise known as Robert de Caen, the illegitimate son of Henry I of England, making her Henry's granddaughter)."
+      }
+    ],
+    "dataset": "HotpotQA distractor dev"
+  },
+  {
+    "id": "5a7d61775542991319bc93b9",
+    "type": "bridge",
+    "difficulty": "hard",
+    "question": "During Siege of Bharatpur, which Commander-in-Chief of Ireland and Commander-in-Chief of India contributed to the storming of the castle?",
+    "reference_answer": "Lord Combermere",
+    "source_files": [
+      "hotpot/siege_of_bharatpur.md",
+      "hotpot/stapleton_cotton_1st_viscount_combermere.md"
+    ],
+    "supporting_facts": [
+      {
+        "title": "Siege of Bharatpur",
+        "sent_id": 1,
+        "sentence": " British troops under Lord Combermere initially surrounded the state's capital until on 18January 1826 its fortress was stormed and captured."
+      },
+      {
+        "title": "Stapleton Cotton, 1st Viscount Combermere",
+        "sent_id": 3,
+        "sentence": " He went on to be Commander-in-Chief, Ireland and then Commander-in-Chief, India."
+      }
+    ],
+    "dataset": "HotpotQA distractor dev"
+  },
+  {
+    "id": "5a7d19d85542995ed0d165e8",
+    "type": "bridge",
+    "difficulty": "hard",
+    "question": "The Tennessee Volunteers football team plays as a member for a conference in what city?",
+    "reference_answer": "Birmingham, Alabama",
+    "source_files": [
+      "hotpot/1984_tennessee_volunteers_football_team.md",
+      "hotpot/southeastern_conference.md"
+    ],
+    "supporting_facts": [
+      {
+        "title": "1984 Tennessee Volunteers football team",
+        "sent_id": 1,
+        "sentence": " Playing as a member of the Southeastern Conference (SEC), the team was led by head coach Johnny Majors, in his eighth year, and played their home games at Neyland Stadium in Knoxville, Tennessee."
+      },
+      {
+        "title": "Southeastern Conference",
+        "sent_id": 2,
+        "sentence": " The conference is headquartered in Birmingham, Alabama."
+      }
+    ],
+    "dataset": "HotpotQA distractor dev"
+  },
+  {
+    "id": "5a7a9a2255429941d65f26eb",
+    "type": "bridge",
+    "difficulty": "hard",
+    "question": "Kang Sung-yeon played Prince Yeonsan in a film that runs for how many minutes ?",
+    "reference_answer": "119 minutes",
+    "source_files": [
+      "hotpot/kang_sung_yeon.md",
+      "hotpot/king_and_the_clown.md"
+    ],
+    "supporting_facts": [
+      {
+        "title": "Kang Sung-yeon",
+        "sent_id": 3,
+        "sentence": " Then in 2005, Kang rose to fame when she played Prince Yeonsan's concubine Jang Nok-su in \"King and the Clown\", a period film that drew 12.3 admissions, making it (at the time) the highest-grossing domestic film in Korean cinema history."
+      },
+      {
+        "title": "King and the Clown",
+        "sent_id": 3,
+        "sentence": " It was released on 29 December 2005, runs for 119 minutes; and distributed domestically by Cinema Service and internationally by CJ Entertainment."
+      }
+    ],
+    "dataset": "HotpotQA distractor dev"
+  },
+  {
+    "id": "5abd259d55429924427fcf1a",
+    "type": "comparison",
+    "difficulty": "hard",
+    "question": "Are both Dictyosperma, and Huernia described as a genus?",
+    "reference_answer": "yes",
+    "source_files": [
+      "hotpot/dictyosperma.md",
+      "hotpot/huernia.md"
+    ],
+    "supporting_facts": [
+      {
+        "title": "Dictyosperma",
+        "sent_id": 0,
+        "sentence": "Dictyosperma is a monotypic genus of flowering plant in the palm family found in the Mascarene Islands in the Indian Ocean (Mauritius, Réunion and Rodrigues)."
+      },
+      {
+        "title": "Huernia",
+        "sent_id": 0,
+        "sentence": "The genus Huernia (family Apocynaceae, subfamily Asclepiadoideae) consists of stem succulents from Eastern and Southern Africa, first described as a genus in 1810."
+      }
+    ],
+    "dataset": "HotpotQA distractor dev"
+  },
+  {
+    "id": "5ab6369655429953192ad2a1",
+    "type": "comparison",
+    "difficulty": "hard",
+    "question": "Which Genus has more species Eucryphia or Lepidozamia ?",
+    "reference_answer": "Eucryphia",
+    "source_files": [
+      "hotpot/eucryphia.md",
+      "hotpot/lepidozamia.md"
+    ],
+    "supporting_facts": [
+      {
+        "title": "Eucryphia",
+        "sent_id": 0,
+        "sentence": "Eucryphia is a small genus of trees and large shrubs native to the south temperate regions of South America and coastal eastern Australia."
+      },
+      {
+        "title": "Eucryphia",
+        "sent_id": 1,
+        "sentence": " Sometimes placed in a family of their own, the Eucryphiaceae, more recent classifications place them in the Cunoniaceae."
+      },
+      {
+        "title": "Eucryphia",
+        "sent_id": 2,
+        "sentence": " There are seven species, two in South America and five in Australia, and several named hybrids."
+      },
+      {
+        "title": "Lepidozamia",
+        "sent_id": 0,
+        "sentence": "Lepidozamia is a genus of two species of cycad, both endemic to Australia."
+      }
+    ],
+    "dataset": "HotpotQA distractor dev"
+  },
+  {
+    "id": "5a778a3b5542992a6e59dec7",
+    "type": "bridge",
+    "difficulty": "hard",
+    "question": "What 1991 Disney film is also a 1946 French romantic fantasy film directed by French poet and filmmaker Jean Cocteau?",
+    "reference_answer": "Beauty and the Beast",
+    "source_files": [
+      "hotpot/beauty_and_the_beast_1946_film.md",
+      "hotpot/beauty_and_the_beast_1991_film.md"
+    ],
+    "supporting_facts": [
+      {
+        "title": "Beauty and the Beast (1991 film)",
+        "sent_id": 0,
+        "sentence": "Beauty and the Beast is a 1991 American animated musical romantic fantasy film produced by Walt Disney Feature Animation and released by Walt Disney Pictures."
+      },
+      {
+        "title": "Beauty and the Beast (1946 film)",
+        "sent_id": 0,
+        "sentence": "Beauty and the Beast (French: La Belle et la Bête ) is a 1946 French romantic fantasy film directed by French poet and filmmaker Jean Cocteau."
+      }
+    ],
+    "dataset": "HotpotQA distractor dev"
+  },
+  {
+    "id": "5a7db62d5542997cc2c4747c",
+    "type": "bridge",
+    "difficulty": "hard",
+    "question": "What German state was Karl Julius Perleb born in?",
+    "reference_answer": "Baden-Württemberg",
+    "source_files": [
+      "hotpot/freiburg_im_breisgau.md",
+      "hotpot/karl_julius_perleb.md"
+    ],
+    "supporting_facts": [
+      {
+        "title": "Karl Julius Perleb",
+        "sent_id": 0,
+        "sentence": "Karl Julius Perleb (20 June 1794, Konstanz – 8 June 1845, Freiburg im Breisgau) (also known as Carl Julius Perleb) was a German botanist and natural scientist."
+      },
+      {
+        "title": "Freiburg im Breisgau",
+        "sent_id": 0,
+        "sentence": "Freiburg im Breisgau (] ; Alemannic: \"Friburg im Brisgau\" [ˈfʁiːb̥əɡ̊] ; French: \"Fribourg-en-Brisgau\" ) is a city in Baden-Württemberg, Germany with a population of about 220,000."
+      }
+    ],
+    "dataset": "HotpotQA distractor dev"
+  },
+  {
+    "id": "5a8ac44055429970aeb70304",
+    "type": "bridge",
+    "difficulty": "hard",
+    "question": "Which segment of If These Walls Could Talk did the Goddess of Pop direct?",
+    "reference_answer": "the third",
+    "source_files": [
+      "hotpot/cher.md",
+      "hotpot/if_these_walls_could_talk.md"
+    ],
+    "supporting_facts": [
+      {
+        "title": "If These Walls Could Talk",
+        "sent_id": 0,
+        "sentence": "If These Walls Could Talk is a 1996 made-for-cable film, broadcast on HBO."
+      },
+      {
+        "title": "If These Walls Could Talk",
+        "sent_id": 4,
+        "sentence": " Savoca directed the first and second segment while Cher directed the third."
+      },
+      {
+        "title": "Cher",
+        "sent_id": 0,
+        "sentence": "Cher ( ; born Cherilyn Sarkisian; May 20, 1946) is an American singer and actress."
+      },
+      {
+        "title": "Cher",
+        "sent_id": 1,
+        "sentence": " Sometimes referred to as the Goddess of Pop, she has been described as embodying female autonomy in a male-dominated industry."
+      }
+    ],
+    "dataset": "HotpotQA distractor dev"
+  },
+  {
+    "id": "5ab9aed855429970cfb8eb6d",
+    "type": "comparison",
+    "difficulty": "hard",
+    "question": "Do the bands named Phoenix and Shearwater specialize in the exact same genre?",
+    "reference_answer": "no",
+    "source_files": [
+      "hotpot/phoenix_band.md",
+      "hotpot/shearwater_band.md"
+    ],
+    "supporting_facts": [
+      {
+        "title": "Phoenix (band)",
+        "sent_id": 0,
+        "sentence": "Phoenix is an indie pop band from Versailles, France, consisting of Thomas Mars (lead vocals), Deck d'Arcy (bass/ keyboards/ backing vocals), Christian Mazzalai (guitar/ keyboards/ backing vocals) and Laurent Brancowitz (guitar/ backing vocals)."
+      },
+      {
+        "title": "Shearwater (band)",
+        "sent_id": 0,
+        "sentence": "Shearwater is an American indie rock band from Austin, Texas, led by multi-instrumentalist and lead singer Jonathan Meiburg, a singer-songwriter."
+      }
+    ],
+    "dataset": "HotpotQA distractor dev"
+  },
+  {
+    "id": "5ade42b55542992fa25da717",
+    "type": "bridge",
+    "difficulty": "hard",
+    "question": "How many novels are there in the series of novels of which Shadows in Flight is the tenth novel ?",
+    "reference_answer": "fifteen",
+    "source_files": [
+      "hotpot/ender_s_game_series.md",
+      "hotpot/shadows_in_flight.md"
+    ],
+    "supporting_facts": [
+      {
+        "title": "Shadows in Flight",
+        "sent_id": 1,
+        "sentence": " When released in 2012, it became the tenth novel published in the \"Ender's Game\" series."
+      },
+      {
+        "title": "Ender's Game (series)",
+        "sent_id": 2,
+        "sentence": " It currently consists of fifteen novels, thirteen short stories, 47 comic issues, an audioplay, and a film."
+      }
+    ],
+    "dataset": "HotpotQA distractor dev"
+  },
+  {
+    "id": "5adea9ea55429939a52fe934",
+    "type": "bridge",
+    "difficulty": "hard",
+    "question": "What was the name of the fanzine that interviewed the Sex Pistols bassist when he was in the band \"The Flowers of Romance?\"",
+    "reference_answer": "SKUM",
+    "source_files": [
+      "hotpot/sid_vicious.md",
+      "hotpot/the_flowers_of_romance_band.md"
+    ],
+    "supporting_facts": [
+      {
+        "title": "The Flowers of Romance (band)",
+        "sent_id": 1,
+        "sentence": " The band never played live or released any recordings, and, like London SS and Masters of the Backside, are more famed for the number of band members that later became well known, including: Sid Vicious of the Sex Pistols, Keith Levene (an early member of The Clash and later of Public Image Ltd) and Palmolive and Viv Albertine, who went on to play in The Slits."
+      },
+      {
+        "title": "The Flowers of Romance (band)",
+        "sent_id": 2,
+        "sentence": " Despite never playing live, they were interviewed by a fanzine named \"SKUM\", in which Sid Vicious proclaimed \"I'll just be the yob that I am now\"."
+      },
+      {
+        "title": "Sid Vicious",
+        "sent_id": 0,
+        "sentence": "Sid Vicious (born John Simon Ritchie, 10 May 1957 – 2 February 1979) was an English bassist and vocalist, most famous as a member of the influential punk rock band the Sex Pistols."
+      }
+    ],
+    "dataset": "HotpotQA distractor dev"
+  },
+  {
+    "id": "5ae67dba55429908198fa5f0",
+    "type": "bridge",
+    "difficulty": "hard",
+    "question": "The Memphis Hustle are based in a suburb of a city with a population of what in 2010?",
+    "reference_answer": "48,982",
+    "source_files": [
+      "hotpot/memphis_hustle.md",
+      "hotpot/southaven_mississippi.md"
+    ],
+    "supporting_facts": [
+      {
+        "title": "Memphis Hustle",
+        "sent_id": 0,
+        "sentence": "The Memphis Hustle are an American professional basketball team of the NBA G League announced to begin play for the 2017–18 season as an affiliate of the Memphis Grizzlies of the National Basketball Association (NBA)."
+      },
+      {
+        "title": "Memphis Hustle",
+        "sent_id": 1,
+        "sentence": " Based in the Memphis suburb of Southaven, Mississippi, the team will play their home games at the Landers Center."
+      },
+      {
+        "title": "Southaven, Mississippi",
+        "sent_id": 0,
+        "sentence": "Southaven is a city in DeSoto County, Mississippi, United States."
+      },
+      {
+        "title": "Southaven, Mississippi",
+        "sent_id": 2,
+        "sentence": " The 2010 census reported a population of 48,982, making Southaven the third largest city in Mississippi."
+      }
+    ],
+    "dataset": "HotpotQA distractor dev"
+  },
+  {
+    "id": "5ae68fcb5542992ae0d1635b",
+    "type": "bridge",
+    "difficulty": "hard",
+    "question": "\"Ew!\" is a song by a television host born where?",
+    "reference_answer": "Bay Ridge, Brooklyn",
+    "source_files": [
+      "hotpot/ew.md",
+      "hotpot/jimmy_fallon.md"
+    ],
+    "supporting_facts": [
+      {
+        "title": "Ew!",
+        "sent_id": 0,
+        "sentence": "\"Ew!\""
+      },
+      {
+        "title": "Ew!",
+        "sent_id": 1,
+        "sentence": " is a song by American television host and comedian Jimmy Fallon, featuring American rapper will.i.am."
+      },
+      {
+        "title": "Jimmy Fallon",
+        "sent_id": 0,
+        "sentence": "James Thomas Fallon (born September 19, 1974) is an American comedian, actor, television host, and musician."
+      },
+      {
+        "title": "Jimmy Fallon",
+        "sent_id": 2,
+        "sentence": " He was born in Bay Ridge, Brooklyn and raised in Saugerties, New York."
+      }
+    ],
+    "dataset": "HotpotQA distractor dev"
+  },
+  {
+    "id": "5ae73d505542991e8301cc2c",
+    "type": "bridge",
+    "difficulty": "hard",
+    "question": "Sebastian Gutierrez is known for writing the screenplay for the 2003 film directed by whom?",
+    "reference_answer": "Mathieu Kassovitz",
+    "source_files": [
+      "hotpot/gothika.md",
+      "hotpot/sebastian_gutierrez.md"
+    ],
+    "supporting_facts": [
+      {
+        "title": "Sebastian Gutierrez",
+        "sent_id": 0,
+        "sentence": "Sebastian Gutierrez (born September 10, 1974) is a Venezuelan film director, screenwriter and film producer."
+      },
+      {
+        "title": "Sebastian Gutierrez",
+        "sent_id": 1,
+        "sentence": " known for writing the screenplays to the films \"Gothika\", \"Snakes on a Plane\", \"The Eye\" and \"The Big Bounce\", and writing and directing two independent female-driven ensemble comedies, \"Women in Trouble\" and \"Elektra Luxx\"."
+      },
+      {
+        "title": "Gothika",
+        "sent_id": 0,
+        "sentence": "Gothika is a 2003 American psychological horror thriller film directed by Mathieu Kassovitz and written by Sebastian Gutierrez."
+      }
+    ],
+    "dataset": "HotpotQA distractor dev"
+  },
+  {
+    "id": "5a879ba55542993e715abfc3",
+    "type": "comparison",
+    "difficulty": "hard",
+    "question": "Which director had the longest career, Alain Resnais or Scott Sidney?",
+    "reference_answer": "Scott Sidney",
+    "source_files": [
+      "hotpot/alain_resnais.md",
+      "hotpot/scott_sidney.md"
+    ],
+    "supporting_facts": [
+      {
+        "title": "Alain Resnais",
+        "sent_id": 0,
+        "sentence": "Alain Resnais (] ; 3 June 19221 March 2014) was a French film director and screenwriter whose career extended over more than six decades."
+      },
+      {
+        "title": "Scott Sidney",
+        "sent_id": 0,
+        "sentence": "Scott Sidney (1872 – 20 July 1928), born Harry Wilbur Siggins, was an American film director."
+      },
+      {
+        "title": "Scott Sidney",
+        "sent_id": 1,
+        "sentence": " He directed 117 films between 1913 and 1927."
+      }
+    ],
+    "dataset": "HotpotQA distractor dev"
+  },
+  {
+    "id": "5a8485fa5542992a431d1a41",
+    "type": "bridge",
+    "difficulty": "hard",
+    "question": "Who was the brother of the architect of Hook and Ladder No. 4 located in Albany, NY?",
+    "reference_answer": "Cuyler Reynolds",
+    "source_files": [
+      "hotpot/hook_and_ladder_no_4.md",
+      "hotpot/marcus_t_reynolds.md"
+    ],
+    "supporting_facts": [
+      {
+        "title": "Hook and Ladder No. 4",
+        "sent_id": 0,
+        "sentence": "Hook and Ladder No. 4, originally Truck No. 4, is a firehouse located at Delaware Avenue (U.S. Route 9W and New York State Route 443) in Albany, New York, United States."
+      },
+      {
+        "title": "Marcus T. Reynolds",
+        "sent_id": 5,
+        "sentence": " He was the brother of the Albany historian and author Cuyler Reynolds."
+      }
+    ],
+    "dataset": "HotpotQA distractor dev"
+  },
+  {
+    "id": "5ae32b6755429928c4239644",
+    "type": "bridge",
+    "difficulty": "hard",
+    "question": "Wendy Ayche was featured in 2016 in an annual production created by Youtube and what other organization?",
+    "reference_answer": "Portal A Interactive",
+    "source_files": [
+      "hotpot/wengie.md",
+      "hotpot/youtube_rewind.md"
+    ],
+    "supporting_facts": [
+      {
+        "title": "Wengie",
+        "sent_id": 5,
+        "sentence": " Ayche was featured in the annual YouTube Rewind in 2016 and was also singled out by Google as one of the top beauty creators in the Asia region."
+      },
+      {
+        "title": "YouTube Rewind",
+        "sent_id": 0,
+        "sentence": "YouTube Rewind is a video series produced and created by YouTube and Portal A Interactive."
+      }
+    ],
+    "dataset": "HotpotQA distractor dev"
+  },
+  {
+    "id": "5a7e14a65542995ed0d16686",
+    "type": "bridge",
+    "difficulty": "hard",
+    "question": "What film was the screen debut of the musician nicknamed \"Lady Day\"?",
+    "reference_answer": "Symphony in Black",
+    "source_files": [
+      "hotpot/billie_holiday.md",
+      "hotpot/symphony_in_black.md"
+    ],
+    "supporting_facts": [
+      {
+        "title": "Symphony in Black",
+        "sent_id": 0,
+        "sentence": "Symphony in Black: A Rhapsody of Negro Life is a nine-and-a-half minute musical short produced in 1935 that features Duke Ellington’s early extended piece, \"A Rhapsody of Negro Life\"."
+      },
+      {
+        "title": "Symphony in Black",
+        "sent_id": 1,
+        "sentence": " The film, Billie Holiday’s screen debut, was directed by Fred Waller and distributed by Paramount Pictures."
+      },
+      {
+        "title": "Billie Holiday",
+        "sent_id": 1,
+        "sentence": " Nicknamed \"Lady Day\" by her friend and music partner Lester Young, Holiday had a seminal influence on jazz music and pop singing."
+      }
+    ],
+    "dataset": "HotpotQA distractor dev"
+  },
+  {
+    "id": "5a7a05485542990783324def",
+    "type": "bridge",
+    "difficulty": "hard",
+    "question": "Which song by Last One Picked appeared in a 2004 American teen musical comedy film directed by Sara Sugarman?",
+    "reference_answer": "Na Na",
+    "source_files": [
+      "hotpot/confessions_of_a_teenage_drama_queen.md",
+      "hotpot/last_one_picked.md"
+    ],
+    "supporting_facts": [
+      {
+        "title": "Last One Picked",
+        "sent_id": 0,
+        "sentence": "Last One Picked is the second studio album by the Christian rock band Superchic[k]."
+      },
+      {
+        "title": "Last One Picked",
+        "sent_id": 2,
+        "sentence": " \"Na Na\" appeared on the Disney film, \"Confessions of a Teenage Drama Queen\"."
+      },
+      {
+        "title": "Confessions of a Teenage Drama Queen",
+        "sent_id": 0,
+        "sentence": "Confessions of a Teenage Drama Queen is a 2004 American teen musical comedy film directed by Sara Sugarman and produced by Robert Shapiro and Matthew Hart for Walt Disney Pictures."
+      }
+    ],
+    "dataset": "HotpotQA distractor dev"
+  },
+  {
+    "id": "5ab7f97a5542991d322237ef",
+    "type": "bridge",
+    "difficulty": "hard",
+    "question": "What is Opry Mills in Nashville, Tennessee?",
+    "reference_answer": "super-regional shopping mall",
+    "source_files": [
+      "hotpot/music_city_queen.md",
+      "hotpot/opry_mills.md"
+    ],
+    "supporting_facts": [
+      {
+        "title": "Music City Queen",
+        "sent_id": 1,
+        "sentence": " It was the smaller of two stern-wheel paddle steamers based at Opry Mills in Nashville, Tennessee; the other is the \"General Jackson\"."
+      },
+      {
+        "title": "Opry Mills",
+        "sent_id": 0,
+        "sentence": "Opry Mills is a super-regional shopping mall owned by Simon Property Group, formerly by its initial owners Mills Corporation and Gaylord Entertainment."
+      }
+    ],
+    "dataset": "HotpotQA distractor dev"
+  },
+  {
+    "id": "5ab8f57b5542991b5579f097",
+    "type": "comparison",
+    "difficulty": "hard",
+    "question": "Were Thomas H. Ince and Joseph McGrath of the same nationality?",
+    "reference_answer": "no",
+    "source_files": [
+      "hotpot/joseph_mcgrath_film_director.md",
+      "hotpot/thomas_h_ince.md"
+    ],
+    "supporting_facts": [
+      {
+        "title": "Thomas H. Ince",
+        "sent_id": 0,
+        "sentence": "Thomas Harper Ince (November 16, 1880 – November 19, 1924) was an American silent film producer, director, screenwriter, and actor."
+      },
+      {
+        "title": "Joseph McGrath (film director)",
+        "sent_id": 0,
+        "sentence": "Joseph McGrath (born 1930, Glasgow) is a Scottish film and television director and screenwriter."
+      }
+    ],
+    "dataset": "HotpotQA distractor dev"
+  },
+  {
+    "id": "5a722c2255429971e9dc932c",
+    "type": "bridge",
+    "difficulty": "hard",
+    "question": "What type of development, currently existing in Pasay, is currently being considered for malls such as one in M.A. Roxas Avenue in Clark Freeport, Angeles City in Pampanga Philippines?",
+    "reference_answer": "SM Lifestyle Cities",
+    "source_files": [
+      "hotpot/sm_city_clark.md",
+      "hotpot/sm_lifestyle_city.md"
+    ],
+    "supporting_facts": [
+      {
+        "title": "SM Lifestyle City",
+        "sent_id": 0,
+        "sentence": "SM Lifestyle Cities are integrated mixed-used developments of SM prime Holdings."
+      },
+      {
+        "title": "SM Lifestyle City",
+        "sent_id": 2,
+        "sentence": " SM Prime plans to develop more \"lifestyle cities\" similar to the 60-hectare Mall of Asia Complex in Pasay City which will optimize land where premiere malls currently stand."
+      },
+      {
+        "title": "SM Lifestyle City",
+        "sent_id": 3,
+        "sentence": " Subsequent Lifestyle Cities are eyed for SM City Clark in Angeles City, Pampanga, SM City North EDSA, SM Lanang Premier in Davao, SM Southmall and in its rising development SM Seaside City Cebu."
+      },
+      {
+        "title": "SM City Clark",
+        "sent_id": 0,
+        "sentence": "SM City Clark is a shopping mall owned and operated by SM Prime Holdings."
+      },
+      {
+        "title": "SM City Clark",
+        "sent_id": 1,
+        "sentence": " It is located along M.A. Roxas Avenue in Clark Freeport, Angeles City in Pampanga, Philippines."
+      }
+    ],
+    "dataset": "HotpotQA distractor dev"
+  },
+  {
+    "id": "5a89bbb05542992e4fca83a3",
+    "type": "bridge",
+    "difficulty": "hard",
+    "question": "What star of Parks and Recreation appeared in November?",
+    "reference_answer": "Nick Offerman",
+    "source_files": [
+      "hotpot/nick_offerman.md",
+      "hotpot/november_2004_film.md"
+    ],
+    "supporting_facts": [
+      {
+        "title": "November (2004 film)",
+        "sent_id": 0,
+        "sentence": "November is a 2004 American psychological thriller film first screened at the 2004 Sundance Film Festival."
+      },
+      {
+        "title": "November (2004 film)",
+        "sent_id": 2,
+        "sentence": " The film co-stars Michael Ealy, Nora Dunn, Anne Archer, Nick Offerman, and Matthew Carey."
+      },
+      {
+        "title": "Nick Offerman",
+        "sent_id": 0,
+        "sentence": "Nicholas \"Nick\" Offerman (born June 26, 1970) is an American actor, voice actor, producer, writer, comedian and carpenter widely known for his breakout role as Ron Swanson in the acclaimed NBC sitcom \"Parks and Recreation\", for which he received the Television Critics Association Award for Individual Achievement in Comedy."
+      }
+    ],
+    "dataset": "HotpotQA distractor dev"
+  },
+  {
+    "id": "5a852cd05542997b5ce3ffb0",
+    "type": "bridge",
+    "difficulty": "hard",
+    "question": "The birthplace of George McCall Theal is a port city of what bay?",
+    "reference_answer": "Bay of Fundy",
+    "source_files": [
+      "hotpot/george_mccall_theal.md",
+      "hotpot/saint_john_new_brunswick.md"
+    ],
+    "supporting_facts": [
+      {
+        "title": "George McCall Theal",
+        "sent_id": 0,
+        "sentence": "George McCall Theal (11 April 1837, Saint John, New Brunswick – 17 April 1919, Wynberg, Cape Town), was the most prolific and influential South African historian, archivist and genealogist of the late nineteenth and early twentieth century."
+      },
+      {
+        "title": "Saint John, New Brunswick",
+        "sent_id": 0,
+        "sentence": "Saint John (] ) is the port city of the Bay of Fundy in the Canadian province of New Brunswick."
+      }
+    ],
+    "dataset": "HotpotQA distractor dev"
+  },
+  {
+    "id": "5ac1767a5542994d76dcce48",
+    "type": "bridge",
+    "difficulty": "hard",
+    "question": "What is the 2010 census population of the county where Wildcat Brook flows through Jackson?",
+    "reference_answer": "47,818",
+    "source_files": [
+      "hotpot/carroll_county_new_hampshire.md",
+      "hotpot/wildcat_brook.md"
+    ],
+    "supporting_facts": [
+      {
+        "title": "Wildcat Brook",
+        "sent_id": 1,
+        "sentence": " It rises at Carter Notch in the township of Bean's Purchase in Coos County, and flows south through the town of Jackson in Carroll County to its confluence with the Ellis River near the town's southern boundary."
+      },
+      {
+        "title": "Carroll County, New Hampshire",
+        "sent_id": 1,
+        "sentence": " As of the 2010 census, the population was 47,818, making it the third-least populous county in New Hampshire."
+      }
+    ],
+    "dataset": "HotpotQA distractor dev"
+  },
+  {
+    "id": "5a844fd35542990548d0b274",
+    "type": "comparison",
+    "difficulty": "hard",
+    "question": "What occupation did Nicholas Christopher and Roger Ebert share?",
+    "reference_answer": "author",
+    "source_files": [
+      "hotpot/nicholas_christopher.md",
+      "hotpot/roger_ebert.md"
+    ],
+    "supporting_facts": [
+      {
+        "title": "Nicholas Christopher",
+        "sent_id": 0,
+        "sentence": "Nicholas Christopher (born 1951) is an American novelist, poet and critic, the author of sixteen books: six novels, eight volumes of poetry, a critical study of film noir, and a novel for children."
+      },
+      {
+        "title": "Roger Ebert",
+        "sent_id": 0,
+        "sentence": "Roger Joseph Ebert ( ; June 18, 1942 – April 4, 2013) was an American film critic and historian, journalist, screenwriter, and author."
+      }
+    ],
+    "dataset": "HotpotQA distractor dev"
+  },
+  {
+    "id": "5ae663b05542992ae0d16316",
+    "type": "bridge",
+    "difficulty": "hard",
+    "question": "Edithvale railway station is located on a line that is situated in what city?",
+    "reference_answer": "Melbourne, Australia",
+    "source_files": [
+      "hotpot/edithvale_railway_station.md",
+      "hotpot/frankston_railway_line.md"
+    ],
+    "supporting_facts": [
+      {
+        "title": "Edithvale railway station",
+        "sent_id": 0,
+        "sentence": "Edithvale railway station is located on the Frankston line in Victoria, Australia."
+      },
+      {
+        "title": "Frankston railway line",
+        "sent_id": 0,
+        "sentence": "The Frankston railway line is a bayside suburban electrified railway in Melbourne, Australia."
+      }
+    ],
+    "dataset": "HotpotQA distractor dev"
+  },
+  {
+    "id": "5a80f4c2554299260e20a1da",
+    "type": "bridge",
+    "difficulty": "hard",
+    "question": "What is the nickname of the WWII battleship at the Fall River Heritage State Park?",
+    "reference_answer": "Big Mamie",
+    "source_files": [
+      "hotpot/fall_river_heritage_state_park.md",
+      "hotpot/uss_massachusetts_bb_59.md"
+    ],
+    "supporting_facts": [
+      {
+        "title": "Fall River Heritage State Park",
+        "sent_id": 2,
+        "sentence": " Memorial Bridge on Battleship Cove, home of the World War II battleship USS \"Massachusetts\"."
+      },
+      {
+        "title": "USS Massachusetts (BB-59)",
+        "sent_id": 0,
+        "sentence": "USS \"Massachusetts\" (BB-59), known as \"Big Mamie\" to her crewmembers during World War II, was a battleship of the second \"South Dakota\" class."
+      }
+    ],
+    "dataset": "HotpotQA distractor dev"
+  },
+  {
+    "id": "5ae394e05542990afbd1e18d",
+    "type": "bridge",
+    "difficulty": "hard",
+    "question": "\"The Fixer\" is a song from an album produced by who ?",
+    "reference_answer": "Brendan O'Brien",
+    "source_files": [
+      "hotpot/backspacer.md",
+      "hotpot/the_fixer_song.md"
+    ],
+    "supporting_facts": [
+      {
+        "title": "The Fixer (song)",
+        "sent_id": 1,
+        "sentence": " Featuring lyrics written by vocalist Eddie Vedder and music co-written by drummer Matt Cameron and guitarists Mike McCready and Stone Gossard, \"The Fixer\" was released on August 24, 2009 as the first single from the band's ninth studio album, \"Backspacer\" (2009)."
+      },
+      {
+        "title": "Backspacer",
+        "sent_id": 2,
+        "sentence": " It was recorded from February through April 2009 with producer Brendan O'Brien, who had worked on every Pearl Jam album except their 1991 debut \"Ten\" and 2006's self-titled record—although this was his first production credit since 1998's \"Yield\"."
+      }
+    ],
+    "dataset": "HotpotQA distractor dev"
+  },
+  {
+    "id": "5add26075542994ed6169c9c",
+    "type": "bridge",
+    "difficulty": "hard",
+    "question": "What public radio network in New York has allowed Eric Plakun to dis his psychiatric work?",
+    "reference_answer": "WAMC",
+    "source_files": [
+      "hotpot/eric_plakun.md",
+      "hotpot/wamc.md"
+    ],
+    "supporting_facts": [
+      {
+        "title": "Eric Plakun",
+        "sent_id": 0,
+        "sentence": "Eric M. Plakun, MD, DLFAPA, FACPsych, is an American board certified psychiatrist, psychoanalyst, researcher and forensic psychiatrist."
+      },
+      {
+        "title": "Eric Plakun",
+        "sent_id": 3,
+        "sentence": " Plakun has been widely published and quoted in the media on psychotherapy and psychiatry, including in The New York Times and The Globe and Mail."
+      },
+      {
+        "title": "Eric Plakun",
+        "sent_id": 4,
+        "sentence": " He has appeared in the media to discuss his psychiatric work on WAMC, the Albany, New York affiliate of NPR."
+      },
+      {
+        "title": "WAMC",
+        "sent_id": 0,
+        "sentence": "WAMC is a public radio network headquartered in Albany, New York."
+      }
+    ],
+    "dataset": "HotpotQA distractor dev"
+  }
+]
