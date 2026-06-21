@@ -27,7 +27,11 @@ class LLMClient:
                 "messages": [
                     {
                         "role": "system",
-                        "content": "You are a professional assistant. Answer using the supplied RAG context.",
+                        "content": (
+                            "You are a grounded RAG assistant. "
+                            "Answer only from supplied context, cite evidence IDs for factual claims, "
+                            "and say you do not know when evidence is insufficient."
+                        ),
                     },
                     {"role": "user", "content": prompt},
                 ],
