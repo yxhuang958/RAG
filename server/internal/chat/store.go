@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
+	"strings"
 	"sync"
 	"time"
 )
@@ -17,10 +18,12 @@ type Message struct {
 }
 
 type Session struct {
-	ID        string    `json:"session_id"`
-	UserID    string    `json:"user_id"`
-	Messages  []Message `json:"messages"`
-	UpdatedAt int64     `json:"updated_at"`
+	ID                 string    `json:"session_id"`
+	UserID             string    `json:"user_id"`
+	Messages           []Message `json:"messages"`
+	Summary            string    `json:"summary,omitempty"`
+	SummarizedMessages int       `json:"summarized_messages,omitempty"`
+	UpdatedAt          int64     `json:"updated_at"`
 }
 
 type PipelineMessage struct {
@@ -117,7 +120,72 @@ func (s *Store) AppendExchange(userID, sessionID, question, answer string) (Sess
 	return session, nil
 }
 
-func (s *Store) PipelineHistory(userID, sessionID string) []PipelineMessage {
+func (s *Store) CompactSession(userID, sessionID string, keepMessages int) (Session, bool, error) {
+	if keepMessages < 2 {
+		keepMessages = 2
+	}
+
+	now := time.Now().Unix()
+	s.mu.Lock()
+	session, ok := s.sessions[sessionID]
+	if !ok || session.UserID != userID {
+		s.mu.Unlock()
+		return Session{}, false, errors.New("session not found")
+	}
+	if len(session.Messages) <= keepMessages {
+		s.mu.Unlock()
+		return session, false, nil
+	}
+
+	cutoff := len(session.Messages) - keepMessages
+	toSummarize := session.Messages[:cutoff]
+	session.Summary = mergeSummary(session.Summary, toSummarize)
+	session.SummarizedMessages += len(toSummarize)
+	session.Messages = append([]Message(nil), session.Messages[cutoff:]...)
+	session.UpdatedAt = now
+	s.sessions[sessionID] = session
+
+	snapshot := make(map[string]Session, len(s.sessions))
+	for id, cached := range s.sessions {
+		snapshot[id] = cached
+	}
+	s.mu.Unlock()
+
+	if err := s.writeSessions(snapshot); err != nil {
+		return Session{}, false, err
+	}
+	return session, true, nil
+}
+
+func (s *Store) PipelineHistory(userID, sessionID string, recentMessages int) []PipelineMessage {
+	history, ok := s.GetHistory(userID, sessionID)
+	if !ok {
+		return []PipelineMessage{}
+	}
+	summary := s.SessionSummary(userID, sessionID)
+	if recentMessages > 0 && len(history) > recentMessages {
+		history = history[len(history)-recentMessages:]
+	}
+
+	messages := make([]PipelineMessage, 0, len(history)+1)
+	if summary != "" {
+		messages = append(messages, PipelineMessage{
+			Role:    "system",
+			Content: "Conversation memory summary:\n" + summary,
+		})
+	}
+	for _, item := range history {
+		messages = append(messages, PipelineMessage{Role: item.Role, Content: item.Content})
+	}
+	return messages
+}
+
+func (s *Store) PipelineMessages(userID, sessionID, question string, recentMessages int) []PipelineMessage {
+	messages := s.PipelineHistory(userID, sessionID, recentMessages)
+	return append(messages, PipelineMessage{Role: "user", Content: question})
+}
+
+func (s *Store) PipelineDisplayHistory(userID, sessionID string) []PipelineMessage {
 	history, ok := s.GetHistory(userID, sessionID)
 	if !ok {
 		return []PipelineMessage{}
@@ -130,9 +198,15 @@ func (s *Store) PipelineHistory(userID, sessionID string) []PipelineMessage {
 	return messages
 }
 
-func (s *Store) PipelineMessages(userID, sessionID, question string) []PipelineMessage {
-	messages := s.PipelineHistory(userID, sessionID)
-	return append(messages, PipelineMessage{Role: "user", Content: question})
+func (s *Store) SessionSummary(userID, sessionID string) string {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+
+	session, ok := s.sessions[sessionID]
+	if !ok || session.UserID != userID {
+		return ""
+	}
+	return session.Summary
 }
 
 func (s *Store) readAll() (map[string]Session, error) {
@@ -172,4 +246,29 @@ func (s *Store) writeSessions(sessions map[string]Session) error {
 		return err
 	}
 	return os.WriteFile(s.path, content, 0644)
+}
+
+func mergeSummary(existing string, messages []Message) string {
+	parts := make([]string, 0, len(messages)+1)
+	if existing != "" {
+		parts = append(parts, existing)
+	}
+	parts = append(parts, summarizeMessages(messages))
+	return strings.TrimSpace(strings.Join(parts, "\n"))
+}
+
+func summarizeMessages(messages []Message) string {
+	const maxLineChars = 500
+	lines := make([]string, 0, len(messages))
+	for _, message := range messages {
+		content := strings.Join(strings.Fields(message.Content), " ")
+		if content == "" {
+			continue
+		}
+		if len(content) > maxLineChars {
+			content = content[:maxLineChars] + "..."
+		}
+		lines = append(lines, message.Role+": "+content)
+	}
+	return strings.Join(lines, "\n")
 }

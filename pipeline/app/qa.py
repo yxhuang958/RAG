@@ -109,24 +109,45 @@ def _finalize_contexts(contexts: list[dict], limit: int, max_per_doc: int = 3) -
             }
         )
 
-    limit = max(1, limit)
-    max_per_doc = max(1, max_per_doc)
+    return _select_diverse_contexts(unique_contexts, max(1, limit), max(1, max_per_doc))
+
+
+def _select_diverse_contexts(contexts: list[dict], limit: int, max_per_doc: int) -> list[dict]:
+    grouped: dict[str, list[dict]] = {}
+    doc_order: list[str] = []
+
+    for index, context in enumerate(contexts):
+        doc_id = str(context.get("doc_id") or f"_missing_doc_{index}")
+        if doc_id not in grouped:
+            grouped[doc_id] = []
+            doc_order.append(doc_id)
+        grouped[doc_id].append(context)
+
     selected: list[dict] = []
-    deferred: list[dict] = []
-    doc_counts: dict[str, int] = {}
+    doc_counts = {doc_id: 0 for doc_id in doc_order}
 
-    for context in unique_contexts:
-        doc_id = str(context.get("doc_id") or "")
-        if doc_counts.get(doc_id, 0) >= max_per_doc:
-            deferred.append(context)
-            continue
-        selected.append(context)
-        doc_counts[doc_id] = doc_counts.get(doc_id, 0) + 1
-        if len(selected) >= limit:
-            return selected
+    for round_index in range(max_per_doc):
+        made_progress = False
+        for doc_id in doc_order:
+            if doc_counts[doc_id] > round_index:
+                continue
+            bucket = grouped[doc_id]
+            if not bucket:
+                continue
 
-    for context in deferred:
-        selected.append(context)
+            selected.append(bucket.pop(0))
+            doc_counts[doc_id] += 1
+            made_progress = True
+            if len(selected) >= limit:
+                return selected
+
+        if not made_progress:
+            break
+
+    for doc_id in doc_order:
+        while grouped[doc_id] and len(selected) < limit:
+            selected.append(grouped[doc_id].pop(0))
         if len(selected) >= limit:
             break
+
     return selected

@@ -44,6 +44,13 @@ class WarmupRequest(BaseModel):
     user_id: str
 
 
+class TextIngestRequest(BaseModel):
+    user_id: str
+    text: str
+    filename: str = "text_memory.txt"
+    doc_id: str | None = None
+
+
 @app.get("/")
 def root():
     return {"message": "RAG Pipeline Service is running"}
@@ -90,20 +97,54 @@ def ingest(file: UploadFile = File(...), user_id: str = Form(...)) -> dict:
     if not full_text:
         raise HTTPException(status_code=400, detail="No extractable text")
 
-    # 4. 文本切片 (Chunking)
-    chunks = chunk_text(full_text, settings.chunk_size, settings.chunk_overlap)
+    return _ingest_text_document(
+        user_id=user_id,
+        text=full_text,
+        filename=file.filename,
+        file_hash=_sha256_hex(content),
+    )
+
+
+@app.post("/ingest_text")
+def ingest_text(payload: TextIngestRequest) -> dict:
+    user_id = _normalize_user_id(payload.user_id)
+    if not user_id:
+        raise HTTPException(status_code=400, detail="user_id is required")
+
+    text = payload.text.strip()
+    if not text:
+        raise HTTPException(status_code=400, detail="text is required")
+
+    filename = payload.filename.strip() or "text_memory.txt"
+    return _ingest_text_document(
+        user_id=user_id,
+        text=text,
+        filename=filename,
+        file_hash=_sha256_text(text),
+        requested_doc_id=payload.doc_id,
+    )
+
+
+def _ingest_text_document(
+    *,
+    user_id: str,
+    text: str,
+    filename: str,
+    file_hash: str,
+    requested_doc_id: str | None = None,
+) -> dict:
+    chunks = chunk_text(text, settings.chunk_size, settings.chunk_overlap)
     if not chunks:
         raise HTTPException(status_code=400, detail="Failed to create chunks")
 
-    file_hash = _sha256_hex(content)
     content_hash = _sha256_text("\n\n".join(chunks))
-    doc_id = _build_doc_id(user_id, file.filename, content_hash)
+    doc_id = requested_doc_id or _build_doc_id(user_id, filename, content_hash)
     document, is_new = document_store.reserve(
         user_id=user_id,
         content_hash=content_hash,
         file_hash=file_hash,
         doc_id=doc_id,
-        filename=file.filename,
+        filename=filename,
         chunks=len(chunks),
     )
     if not is_new:

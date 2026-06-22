@@ -15,7 +15,12 @@ def build_prompt(messages: list[dict], contexts: List[dict]) -> str:
     context_str = "\n\n".join(context_blocks)
     history_blocks = []
     for msg in messages[:-1]:
-        role = "User" if msg["role"] == "user" else "Assistant"
+        if msg["role"] == "system":
+            role = "System"
+        elif msg["role"] == "user":
+            role = "User"
+        else:
+            role = "Assistant"
         history_blocks.append(f"{role}: {msg['content']}")
 
     history_str = "\n".join(history_blocks) if history_blocks else "(No previous conversation.)"

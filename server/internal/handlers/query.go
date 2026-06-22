@@ -11,7 +11,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
-	
+
 	"github.com/gin-gonic/gin"
 	"rag-server/internal/config"
 )
@@ -27,6 +27,13 @@ type pipelineQueryRequest struct {
 	Messages any    `json:"messages"`
 	TopK     int    `json:"top_k"`
 	UserID   string `json:"user_id"`
+}
+
+type pipelineTextIngestRequest struct {
+	UserID   string `json:"user_id"`
+	Text     string `json:"text"`
+	Filename string `json:"filename"`
+	DocID    string `json:"doc_id"`
 }
 
 // Query 转发检索+问答请求到云端 Pipeline 服务
@@ -62,10 +69,16 @@ func Query(c *gin.Context) {
 	queryURL := pipelineURL + "/query"
 
 	// 2. 会话历史在业务后端完成隔离，Pipeline 只接收文本上下文
+	recentMessages := envInt("SESSION_RECENT_MESSAGES", 8)
 	pipelineBody, err := json.Marshal(pipelineQueryRequest{
-		Messages: chatStore.PipelineMessages(user.UserID, queryPayload.SessionID, queryPayload.Question),
-		TopK:     queryPayload.TopK,
-		UserID:   user.UserID,
+		Messages: chatStore.PipelineMessages(
+			user.UserID,
+			queryPayload.SessionID,
+			queryPayload.Question,
+			recentMessages,
+		),
+		TopK:   queryPayload.TopK,
+		UserID: user.UserID,
 	})
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to build query payload"})
@@ -143,11 +156,69 @@ func Query(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to save chat history"})
 		return
 	}
+	session, compacted, err := chatStore.CompactSession(user.UserID, queryPayload.SessionID, envInt("SESSION_COMPACT_KEEP_MESSAGES", 12))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to compact chat history"})
+		return
+	}
+	if compacted {
+		go ingestSessionMemory(user.UserID, session.ID, session.Summary)
+	}
 
 	responsePayload["session_id"] = queryPayload.SessionID
-	responsePayload["history"] = chatStore.PipelineHistory(user.UserID, queryPayload.SessionID)
+	responsePayload["history"] = chatStore.PipelineDisplayHistory(user.UserID, queryPayload.SessionID)
+	responsePayload["session_summary"] = chatStore.SessionSummary(user.UserID, queryPayload.SessionID)
 
 	c.JSON(http.StatusOK, responsePayload)
+}
+
+func ingestSessionMemory(userID, sessionID, summary string) {
+	summary = strings.TrimSpace(summary)
+	if summary == "" {
+		return
+	}
+
+	pipelineURL := config.GetEnv("PIPELINE_URL", "http://localhost:9000")
+	ingestURL := pipelineURL + "/ingest_text"
+	body, err := json.Marshal(pipelineTextIngestRequest{
+		UserID:   userID,
+		Text:     "Long-running conversation memory for session " + sessionID + ":\n" + summary,
+		Filename: "session_memory_" + sessionID + ".txt",
+		DocID:    userID + "-session-memory-" + sessionID,
+	})
+	if err != nil {
+		return
+	}
+
+	timeoutSeconds := envInt("SESSION_MEMORY_INGEST_TIMEOUT", 60)
+	request, err := http.NewRequest(http.MethodPost, ingestURL, bytes.NewReader(body))
+	if err != nil {
+		return
+	}
+	request.Header.Set("Content-Type", "application/json")
+
+	apiKey := config.GetEnv("PIPELINE_API_KEY", "")
+	if apiKey != "" {
+		header := config.GetEnv("PIPELINE_API_KEY_HEADER", "Authorization")
+		prefix := config.GetEnv("PIPELINE_API_KEY_PREFIX", "Bearer ")
+		request.Header.Set(header, prefix+apiKey)
+	}
+
+	client := &http.Client{Timeout: time.Duration(timeoutSeconds) * time.Second}
+	response, err := client.Do(request)
+	if err != nil {
+		return
+	}
+	defer response.Body.Close()
+	io.Copy(io.Discard, response.Body)
+}
+
+func envInt(key string, fallback int) int {
+	value, err := strconv.Atoi(config.GetEnv(key, strconv.Itoa(fallback)))
+	if err != nil || value <= 0 {
+		return fallback
+	}
+	return value
 }
 
 func newSessionID() string {
