@@ -239,6 +239,7 @@ def query(payload: QueryRequest) -> dict:
     return {
         "answer": result["answer"],      # LLM 生成的最终答案
         "contexts": result["contexts"],  # 用于生成的参考原文片段（已重排）
+        "query_analysis": result.get("query_analysis"),
     }
 
 

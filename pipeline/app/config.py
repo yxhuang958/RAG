@@ -95,6 +95,10 @@ class Settings:
     )
     second_stage_rerank_weight: float = _get_float("SECOND_STAGE_RERANK_WEIGHT", 0.35)
     second_stage_history_messages: int = _get_int("SECOND_STAGE_HISTORY_MESSAGES", 4)
+    query_preprocess_enabled: bool = _get_bool(os.getenv("QUERY_PREPROCESS_ENABLED"), True)
+    query_long_threshold_chars: int = _get_int("QUERY_LONG_THRESHOLD_CHARS", 1200)
+    query_context_retrieval_chars: int = _get_int("QUERY_CONTEXT_RETRIEVAL_CHARS", 400)
+    query_temp_context_prompt_chars: int = _get_int("QUERY_TEMP_CONTEXT_PROMPT_CHARS", 6000)
 
     llm_provider: str = os.getenv("LLM_PROVIDER", "http")
     llm_endpoint: str | None = os.getenv("LLM_ENDPOINT")

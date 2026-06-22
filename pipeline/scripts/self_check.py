@@ -1,3 +1,8 @@
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
 from app.prompt import build_prompt
 from app.text_utils import chunk_text
 
@@ -7,7 +12,7 @@ def main() -> None:
     chunks = chunk_text(text, 500, 100)
     assert len(chunks) >= 2, "chunking should create multiple chunks"
 
-    prompt = build_prompt("What is A?", [{"text": "AAA"}])
+    prompt = build_prompt([{"role": "user", "content": "What is A?"}], [{"text": "AAA"}])
     assert "Context" in prompt and "Question" in prompt
 
     print("self_check: ok")

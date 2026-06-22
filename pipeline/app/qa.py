@@ -5,6 +5,7 @@ import time
 from .config import get_settings
 from .llm import LLMClient
 from .prompt import build_prompt
+from .query_preprocessor import ProcessedQuery, preprocess_query
 from .rerank import Reranker
 from .retriever import Retriever
 from .second_stage_ranker import SecondStageRanker
@@ -23,11 +24,16 @@ class QAPipeline:
         self.second_stage_ranker = (
             SecondStageRanker() if self.rag_enabled and self.second_stage_enabled else None
         )
+        self.query_preprocess_enabled = settings.query_preprocess_enabled
+        self.query_long_threshold_chars = settings.query_long_threshold_chars
+        self.query_context_retrieval_chars = settings.query_context_retrieval_chars
+        self.query_temp_context_prompt_chars = settings.query_temp_context_prompt_chars
         self.llm = LLMClient()
 
     def answer(self, collection, messages: list[dict], top_k: int) -> dict:
         total_start = time.perf_counter()
-        question = messages[-1]["content"]
+        processed_query = self._preprocess_query(messages[-1]["content"])
+        retrieval_query = processed_query.retrieval_query
 
         start = time.perf_counter()
         if self.retriever is None:
@@ -37,7 +43,7 @@ class QAPipeline:
             start = time.perf_counter()
             _log_timing("qa.rerank_skipped", start, "rag_enabled=false contexts=0")
         else:
-            hits = self.retriever.retrieve(collection, question, top_k)
+            hits = self.retriever.retrieve(collection, retrieval_query, top_k)
             _log_timing("qa.retrieve", start, f"contexts={len(hits)}")
 
             start = time.perf_counter()
@@ -45,14 +51,14 @@ class QAPipeline:
                 reranked = hits[: self.context_top_k]
                 _log_timing("qa.rerank_skipped", start, f"contexts={len(reranked)}")
             else:
-                reranked = self.reranker.rerank(question, hits)
+                reranked = self.reranker.rerank(retrieval_query, hits)
                 _log_timing("qa.rerank", start, f"contexts={len(reranked)}")
 
         start = time.perf_counter()
         if self.second_stage_ranker is None:
             _log_timing("qa.second_stage_rerank_skipped", start, f"contexts={len(reranked)}")
         else:
-            reranked = self.second_stage_ranker.rerank(messages, reranked)
+            reranked = self.second_stage_ranker.rerank(messages, reranked, intent=retrieval_query)
             _log_timing("qa.second_stage_rerank", start, f"contexts={len(reranked)}")
 
         start = time.perf_counter()
@@ -60,7 +66,7 @@ class QAPipeline:
         _log_timing("qa.context_finalize", start, f"contexts={len(reranked)}")
 
         start = time.perf_counter()
-        prompt = build_prompt(messages, reranked)
+        prompt = build_prompt(messages, reranked, processed_query)
         _log_timing("qa.prompt_build", start, f"prompt_chars={len(prompt)}")
 
         start = time.perf_counter()
@@ -70,7 +76,31 @@ class QAPipeline:
         return {
             "answer": answer,
             "contexts": reranked,
+            "query_analysis": {
+                "question": processed_query.question,
+                "retrieval_query": processed_query.retrieval_query,
+                "temporary_context_chars": len(processed_query.temporary_context),
+                "was_split": processed_query.was_split,
+                "strategy": processed_query.strategy,
+            },
         }
+
+    def _preprocess_query(self, question: str) -> ProcessedQuery:
+        if not self.query_preprocess_enabled:
+            return ProcessedQuery(
+                original=question,
+                question=question,
+                temporary_context="",
+                retrieval_query=question,
+                was_split=False,
+                strategy="disabled",
+            )
+        return preprocess_query(
+            question,
+            long_threshold_chars=self.query_long_threshold_chars,
+            retrieval_context_chars=self.query_context_retrieval_chars,
+            prompt_context_chars=self.query_temp_context_prompt_chars,
+        )
 
 
 def _log_timing(stage: str, start: float, extra: str = "") -> None:

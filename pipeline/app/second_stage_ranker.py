@@ -26,11 +26,16 @@ class SecondStageRanker:
             SecondStageRanker._model = SentenceTransformer(self.model_name, device=device)
             SecondStageRanker._model_name = self.model_name
 
-    def rerank(self, messages: list[dict], passages: list[dict]) -> list[dict]:
+    def rerank(
+        self,
+        messages: list[dict],
+        passages: list[dict],
+        intent: str | None = None,
+    ) -> list[dict]:
         if not passages or SecondStageRanker._model is None:
             return passages
 
-        intent = self._build_intent(messages)
+        intent = intent or self._build_intent(messages)
         texts = [str(passage.get("text") or "") for passage in passages]
         embeddings = SecondStageRanker._model.encode(
             [intent, *texts],

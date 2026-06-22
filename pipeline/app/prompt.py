@@ -2,8 +2,14 @@ from __future__ import annotations
 
 from typing import List
 
+from .query_preprocessor import ProcessedQuery
 
-def build_prompt(messages: list[dict], contexts: List[dict]) -> str:
+
+def build_prompt(
+    messages: list[dict],
+    contexts: List[dict],
+    processed_query: ProcessedQuery | None = None,
+) -> str:
     context_blocks = []
     for idx, ctx in enumerate(contexts, start=1):
         doc_id = ctx.get("doc_id") or "unknown_doc"
@@ -24,7 +30,13 @@ def build_prompt(messages: list[dict], contexts: List[dict]) -> str:
         history_blocks.append(f"{role}: {msg['content']}")
 
     history_str = "\n".join(history_blocks) if history_blocks else "(No previous conversation.)"
-    question = messages[-1]["content"]
+    question = processed_query.question if processed_query else messages[-1]["content"]
+    temporary_context = (
+        processed_query.temporary_context.strip()
+        if processed_query and processed_query.temporary_context.strip()
+        else ""
+    )
+    temporary_context_str = temporary_context or "(No temporary context provided.)"
 
     return (
         "Task: Answer the question using the provided RAG context.\n\n"
@@ -38,12 +50,15 @@ def build_prompt(messages: list[dict], contexts: List[dict]) -> str:
         "yes/no conclusion supported by the Context.\n"
         "5. If evidence is partial, still answer from the strongest relevant clue and explain the uncertainty in Evidence, "
         "not in the Answer line.\n"
-        "6. Add brief Evidence bullets with context IDs like [1] or [2]. Use conversation history only to resolve references; "
-        "the Context is the source of evidence.\n\n"
+        "6. User-provided temporary context can clarify the current question or provide text to analyze, but it is not "
+        "retrieved evidence. Do not cite it with context IDs.\n"
+        "7. Add brief Evidence bullets with context IDs like [1] or [2]. Use conversation history only to resolve references; "
+        "the Context is the source of RAG evidence.\n\n"
         "Preferred output format:\n"
         "Answer: <short answer only>\n"
         "Evidence: <optional brief supporting notes with context IDs>\n\n"
         f"Context:\n{context_str}\n\n"
+        f"User-provided temporary context:\n{temporary_context_str}\n\n"
         f"Conversation history:\n{history_str}\n\n"
         f"Question: {question}"
     )
