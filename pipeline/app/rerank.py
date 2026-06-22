@@ -18,6 +18,7 @@ except ImportError:
     aiplatform = None
 
 from .config import get_settings
+from .sanitize import redact_secrets
 
 
 _LATIN_TOKEN_RE = re.compile(r"[a-z0-9]+")
@@ -101,7 +102,7 @@ class Reranker:
             Reranker._vertex_circuit_open_until = time.time() + self.circuit_breaker_seconds
             print(
                 f"WARNING - Vertex rerank circuit opened for {self.circuit_breaker_seconds}s "
-                f"after {Reranker._vertex_failures} failure(s): {error}",
+                f"after {Reranker._vertex_failures} failure(s): {redact_secrets(error)}",
                 flush=True,
             )
 
@@ -118,7 +119,8 @@ class Reranker:
                 wait_seconds = 2 ** attempt
                 print(
                     f"WARNING - Vertex rerank endpoint is warming up; "
-                    f"retrying in {wait_seconds}s ({attempt + 1}/{self.vertex_retries}): {error}"
+                    f"retrying in {wait_seconds}s ({attempt + 1}/{self.vertex_retries}): "
+                    f"{redact_secrets(error)}"
                 )
                 time.sleep(wait_seconds)
 
@@ -163,7 +165,10 @@ class Reranker:
             if response is None:
                 if last_error:
                     self._record_vertex_failure(last_error)
-                print(f"WARNING - [Rerank Status]: FALLBACK (调用失败); using lexical fallback: {last_error}")
+                print(
+                    "WARNING - [Rerank Status]: FALLBACK (调用失败); using lexical fallback: "
+                    f"{redact_secrets(last_error)}"
+                )
                 return self._generic_rerank_logic(query, passages)
             
             # print(f"DEBUG - Vertex AI Raw Predictions: {response.predictions}")
@@ -202,7 +207,8 @@ class Reranker:
                 data = response.json()
                 # 假设你的模型服务返回格式为 {"scores": [0.9, 0.1, ...]}
                 return data.get("scores") or []
-        except Exception:
+        except Exception as error:
+            print(f"WARNING - HTTP rerank failed; using lexical fallback: {redact_secrets(error)}")
             return self._generic_rerank_logic(query, passages) # 异常降级
 
     def _extract_vertex_scores(self, predictions: Any) -> List[float]:
@@ -273,7 +279,7 @@ class Reranker:
         try:
             semantic_scores = self._call_model_rerank(query, texts)
         except Exception as error:
-            print(f"WARNING - Rerank model failed; using lexical fallback: {error}")
+            print(f"WARNING - Rerank model failed; using lexical fallback: {redact_secrets(error)}")
             semantic_scores = self._generic_rerank_logic(query, texts)
 
         recall_weight = 0.2 if any(score > 0 for score in recall_scores) else 0.0

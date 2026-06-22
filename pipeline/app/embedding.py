@@ -8,6 +8,7 @@ import httpx
 from sentence_transformers import SentenceTransformer
 
 from .config import get_settings
+from .sanitize import redact_secrets
 
 
 def _mock_embed(text: str, dim: int) -> List[float]:
@@ -60,7 +61,12 @@ class EmbeddingClient:
         payload = {"model": self.model_name, "texts": texts}
         with httpx.Client(timeout=30) as client:
             response = client.post(self.endpoint, json=payload, headers=headers)
-            response.raise_for_status()
+            try:
+                response.raise_for_status()
+            except httpx.HTTPStatusError as exc:
+                detail = redact_secrets(response.text.strip())
+                error = redact_secrets(exc)
+                raise RuntimeError(f"Embedding request failed: {error}; response={detail}") from exc
             data = response.json()
 
         vectors = data.get("vectors") or data.get("embeddings")

@@ -6,6 +6,8 @@ from pathlib import Path
 
 import httpx
 
+from app.sanitize import redact_secrets
+
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 ENV_PATH = PROJECT_ROOT / ".env"
@@ -72,7 +74,7 @@ def main() -> None:
 
     if response.is_error:
         print(f"LLM API test failed: HTTP {response.status_code}")
-        print(response.text)
+        print(redact_secrets(response.text))
         raise SystemExit(1)
 
     data = response.json()

@@ -5,6 +5,7 @@ import time
 from typing import Any
 
 from .config import get_settings
+from .sanitize import redact_secrets
 
 
 _RETRYABLE_STATUS_CODES = {408, 409, 425, 429, 500, 502, 503, 504}
@@ -83,7 +84,7 @@ class LLMClient:
                 try:
                     response = client.post(self.endpoint, json=payload, headers=headers) # llm request
                     if response.status_code in _RETRYABLE_STATUS_CODES:
-                        detail = response.text.strip()
+                        detail = redact_secrets(response.text.strip())
                         raise RuntimeError(
                             f"retryable LLM HTTP {response.status_code}: {detail[:500]}"
                         )
@@ -92,8 +93,9 @@ class LLMClient:
                     data = response.json()
                     return self._extract_text(data)
                 except httpx.HTTPStatusError as exc:
-                    detail = exc.response.text.strip()
-                    raise RuntimeError(f"LLM request failed: {exc}; response={detail}") from exc
+                    detail = redact_secrets(exc.response.text.strip())
+                    error = redact_secrets(exc)
+                    raise RuntimeError(f"LLM request failed: {error}; response={detail}") from exc
                 except _RETRYABLE_ERRORS as exc:
                     last_error = exc
                     if attempt >= self.retries:
@@ -101,9 +103,11 @@ class LLMClient:
                     wait_seconds = min(8.0, 0.5 * (2 ** (attempt - 1)))
                     print(
                         f"WARNING - LLM request attempt {attempt}/{self.retries} failed; "
-                        f"retrying in {wait_seconds:.1f}s: {exc}",
+                        f"retrying in {wait_seconds:.1f}s: {redact_secrets(exc)}",
                         flush=True,
                     )
                     time.sleep(wait_seconds)
 
-        raise RuntimeError(f"LLM request failed after {self.retries} attempt(s): {last_error}") from last_error
+        raise RuntimeError(
+            f"LLM request failed after {self.retries} attempt(s): {redact_secrets(last_error)}"
+        ) from last_error
