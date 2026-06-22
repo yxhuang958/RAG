@@ -150,13 +150,13 @@ class Reranker:
             response = None
             last_error = None
             for idx, instances in enumerate(candidate_payloads, start=1):
-                print(f"DEBUG - Attempting format {idx}: {instances[:1]}")
+                # print(f"DEBUG - Attempting format {idx}: {instances[:1]}")
                 try:
                     response = self._predict_vertex_with_retry(endpoint, instances)
                     break
                 except Exception as e:
                     last_error = e
-                    print(f"DEBUG - Format {idx} failed: {e}")
+                    # print(f"DEBUG - Format {idx} failed: {e}")
                     if self._is_transient_vertex_error(e):
                         break
 
@@ -166,7 +166,7 @@ class Reranker:
                 print(f"WARNING - [Rerank Status]: FALLBACK (调用失败); using lexical fallback: {last_error}")
                 return self._generic_rerank_logic(query, passages)
             
-            print(f"DEBUG - Vertex AI Raw Predictions: {response.predictions}")
+            # print(f"DEBUG - Vertex AI Raw Predictions: {response.predictions}")
             
             # 通用分数提取逻辑
             scores = self._extract_vertex_scores(response.predictions)
@@ -300,4 +300,4 @@ class Reranker:
 
         # 按优化后的得分降序排列
         passages.sort(key=lambda p: p.get("rerank_score", 0.0), reverse=True)
-        return passages[: self.top_k]
+        return passages

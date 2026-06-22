@@ -122,7 +122,50 @@ class DocumentStore:
                     return text if isinstance(text, str) else None
         return None
 
-    def hydrate_hits(self, user_id: str, hits: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    def get_chunk_window(
+        self,
+        user_id: str,
+        doc_id: str,
+        chunk_index: int,
+        radius: int,
+    ) -> tuple[str, list[int]] | None:
+        radius = max(0, radius)
+        with self._lock:
+            documents = self._read()
+            for item in documents.values():
+                if (
+                    item.get("user_id") != user_id
+                    or item.get("doc_id") != doc_id
+                    or item.get("status") != "ready"
+                ):
+                    continue
+
+                chunk_texts = item.get("chunk_texts") or []
+                if not 0 <= chunk_index < len(chunk_texts):
+                    return None
+
+                start = max(0, chunk_index - radius)
+                end = min(len(chunk_texts), chunk_index + radius + 1)
+                indices: list[int] = []
+                texts: list[str] = []
+                for index in range(start, end):
+                    text = chunk_texts[index]
+                    if not isinstance(text, str) or not text.strip():
+                        continue
+                    indices.append(index)
+                    texts.append(text.strip())
+
+                if not texts:
+                    return None
+                return "\n\n".join(texts), indices
+        return None
+
+    def hydrate_hits(
+        self,
+        user_id: str,
+        hits: list[dict[str, Any]],
+        neighbor_window: int = 0,
+    ) -> list[dict[str, Any]]:
         hydrated: list[dict[str, Any]] = []
         for hit in hits:
             doc_id = hit.get("doc_id")
@@ -130,11 +173,19 @@ class DocumentStore:
             if not isinstance(doc_id, str) or not isinstance(chunk_index, int):
                 continue
 
-            text = self.get_chunk(user_id, doc_id, chunk_index)
-            if not text:
+            window = self.get_chunk_window(user_id, doc_id, chunk_index, neighbor_window)
+            if not window:
                 continue
+            text, source_indices = window
 
-            hydrated.append({**hit, "text": text})
+            hydrated.append(
+                {
+                    **hit,
+                    "text": text,
+                    "source_chunk_index": chunk_index,
+                    "source_chunk_indices": source_indices,
+                }
+            )
         return hydrated
 
     def list_user_chunks(self, user_id: str) -> list[dict[str, Any]]:

@@ -5,20 +5,39 @@ import os
 from pathlib import Path
 from dotenv import load_dotenv
 
-# 加载 .env 文件
-load_dotenv()
-
+_PIPELINE_ROOT = Path(__file__).resolve().parents[1]
 _REPO_ROOT = Path(__file__).resolve().parents[2]
+load_dotenv(_PIPELINE_ROOT / ".env")
 _VECTOR_METRICS = {"L2", "COSINE", "IP"}
 
 def _get_bool(value: str | None, default: bool = False) -> bool:
-    if value is None:
+    if value is None or value.strip() == "":
         return default
     return value.strip().lower() in {"1", "true", "yes", "y"}
 
 
+def _get_int(name: str, default: int) -> int:
+    value = os.getenv(name)
+    if value is None or value.strip() == "":
+        return default
+    try:
+        return int(value)
+    except ValueError as exc:
+        raise ValueError(f"{name} must be an integer, got {value!r}") from exc
+
+
+def _get_float(name: str, default: float) -> float:
+    value = os.getenv(name)
+    if value is None or value.strip() == "":
+        return default
+    try:
+        return float(value)
+    except ValueError as exc:
+        raise ValueError(f"{name} must be a float, got {value!r}") from exc
+
+
 def _get_vector_metric() -> str:
-    metric = os.getenv("VECTOR_METRIC", "L2").strip().upper()
+    metric = (os.getenv("VECTOR_METRIC") or "L2").strip().upper()
     if metric not in _VECTOR_METRICS:
         raise ValueError(f"VECTOR_METRIC must be one of {sorted(_VECTOR_METRICS)}, got {metric!r}")
     return metric
@@ -28,7 +47,7 @@ def _get_vector_metric() -> str:
 class Settings:
     service_name: str = os.getenv("SERVICE_NAME", "rag-pipeline")
     host: str = os.getenv("HOST", "0.0.0.0")
-    port: int = int(os.getenv("PORT", "9000"))
+    port: int = _get_int("PORT", 9000)
 
     milvus_uri: str | None = os.getenv("MILVUS_URI")
     milvus_token: str | None = os.getenv("MILVUS_TOKEN")
@@ -46,38 +65,43 @@ class Settings:
     embedding_endpoint: str | None = os.getenv("EMBEDDING_ENDPOINT")
     embedding_api_key: str | None = os.getenv("EMBEDDING_API_KEY")
     embedding_model: str = os.getenv("EMBEDDING_MODEL", "Qwen/Qwen3-Embedding-0.6B")
-    embedding_dim: int = int(os.getenv("EMBEDDING_DIM", "1024"))
+    embedding_dim: int = _get_int("EMBEDDING_DIM", 1024)
     vector_metric: str = _get_vector_metric()
     normalize_embeddings: bool = _get_bool(os.getenv("NORMALIZE_EMBEDDINGS"), False)
 
     rag_enabled: bool = _get_bool(os.getenv("RAG_ENABLED"), True)
     multi_retrieval_enabled: bool = _get_bool(os.getenv("MULTI_RETRIEVAL_ENABLED"), False)
-    multi_retrieval_dense_factor: int = int(os.getenv("MULTI_RETRIEVAL_DENSE_FACTOR", "3"))
-    multi_retrieval_lexical_factor: int = int(os.getenv("MULTI_RETRIEVAL_LEXICAL_FACTOR", "3"))
-    multi_retrieval_rrf_k: int = int(os.getenv("MULTI_RETRIEVAL_RRF_K", "60"))
+    multi_retrieval_dense_factor: int = _get_int("MULTI_RETRIEVAL_DENSE_FACTOR", 3)
+    multi_retrieval_lexical_factor: int = _get_int("MULTI_RETRIEVAL_LEXICAL_FACTOR", 3)
+    multi_retrieval_rrf_k: int = _get_int("MULTI_RETRIEVAL_RRF_K", 60)
+    retrieval_neighbor_window: int = _get_int("RETRIEVAL_NEIGHBOR_WINDOW", 1)
+    evidence_window_sentences: int = _get_int("EVIDENCE_WINDOW_SENTENCES", 1)
+    evidence_candidate_factor: int = _get_int("EVIDENCE_CANDIDATE_FACTOR", 3)
+    context_max_per_doc: int = _get_int("CONTEXT_MAX_PER_DOC", 3)
     rerank_provider: str = os.getenv("RERANK_PROVIDER", "overlap")
     rerank_enabled: bool = _get_bool(os.getenv("RERANK_ENABLED"), True)
     rerank_endpoint: str | None = os.getenv("RERANK_ENDPOINT")
     rerank_api_key: str | None = os.getenv("RERANK_API_KEY")
     rerank_model: str = os.getenv("RERANK_MODEL", "BAAI/bge-reranker-v2-m3") # 新增
-    rerank_top_k: int = int(os.getenv("RERANK_TOP_K", "5"))
-    rerank_weight: float = float(os.getenv("RERANK_WEIGHT", "0.6"))
-    rerank_circuit_breaker_seconds: int = int(os.getenv("RERANK_CIRCUIT_BREAKER_SECONDS", "60"))
-    rerank_circuit_breaker_failures: int = int(os.getenv("RERANK_CIRCUIT_BREAKER_FAILURES", "1"))
-    rerank_vertex_retries: int = int(os.getenv("RERANK_VERTEX_RETRIES", "2"))
+    rerank_top_k: int = _get_int("RERANK_TOP_K", 5)
+    rerank_weight: float = _get_float("RERANK_WEIGHT", 0.6)
+    rerank_circuit_breaker_seconds: int = _get_int("RERANK_CIRCUIT_BREAKER_SECONDS", 60)
+    rerank_circuit_breaker_failures: int = _get_int("RERANK_CIRCUIT_BREAKER_FAILURES", 1)
+    rerank_vertex_retries: int = _get_int("RERANK_VERTEX_RETRIES", 2)
     second_stage_rerank_enabled: bool = _get_bool(os.getenv("SECOND_STAGE_RERANK_ENABLED"), False)
     second_stage_rerank_model: str = os.getenv(
         "SECOND_STAGE_RERANK_MODEL",
         "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
     )
-    second_stage_rerank_weight: float = float(os.getenv("SECOND_STAGE_RERANK_WEIGHT", "0.35"))
-    second_stage_history_messages: int = int(os.getenv("SECOND_STAGE_HISTORY_MESSAGES", "4"))
+    second_stage_rerank_weight: float = _get_float("SECOND_STAGE_RERANK_WEIGHT", 0.35)
+    second_stage_history_messages: int = _get_int("SECOND_STAGE_HISTORY_MESSAGES", 4)
 
     llm_provider: str = os.getenv("LLM_PROVIDER", "http")
     llm_endpoint: str | None = os.getenv("LLM_ENDPOINT")
     llm_api_key: str | None = os.getenv("LLM_API_KEY")
     llm_model: str = os.getenv("LLM_MODEL", "llm-model")
-    llm_timeout_seconds: int = int(os.getenv("LLM_TIMEOUT_SECONDS", "60"))
+    llm_timeout_seconds: int = _get_int("LLM_TIMEOUT_SECONDS", 60)
+    llm_retries: int = _get_int("LLM_RETRIES", 3)
 
     # GCP Vertex AI Settings
     gcp_project_id: str | None = os.getenv("GCP_PROJECT_ID")
@@ -85,15 +109,15 @@ class Settings:
     vertex_embedding_endpoint_id: str | None = os.getenv("VERTEX_EMBEDDING_ENDPOINT_ID")
     vertex_rerank_endpoint_id: str | None = os.getenv("VERTEX_RERANK_ENDPOINT_ID")
 
-    chunk_size: int = int(os.getenv("CHUNK_SIZE", "500"))
-    chunk_overlap: int = int(os.getenv("CHUNK_OVERLAP", "80"))
+    chunk_size: int = _get_int("CHUNK_SIZE", 500)
+    chunk_overlap: int = _get_int("CHUNK_OVERLAP", 80)
     document_store_path: str = os.getenv(
         "DOCUMENT_STORE_PATH",
         str(_REPO_ROOT / "server" / "data" / "pipeline_documents.json"),
     )
     debug: bool = _get_bool(os.getenv("DEBUG"), False)
     
-    retrieve_top_k: int = int(os.getenv("RETRIEVE_TOPK", "30"))
+    retrieve_top_k: int = _get_int("RETRIEVE_TOPK", 30)
 
 _settings: Settings | None = None
 
