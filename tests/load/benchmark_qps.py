@@ -48,7 +48,13 @@ def main() -> int:
         default="query",
         help="query measures end-to-end RAG; health measures service HTTP baseline.",
     )
-    parser.add_argument("--url", default=None, help="Base URL. Defaults: backend=http://localhost:8080, pipeline=http://localhost:9000")
+    parser.add_argument(
+        "--pipeline-mode",
+        choices=("real", "mock"),
+        default="real",
+        help="real uses the normal pipeline; mock uses the dev mock pipeline.",
+    )
+    parser.add_argument("--url", default=None, help="Base URL. Defaults: backend=http://localhost:8080, pipeline real=http://localhost:9000, pipeline mock=http://127.0.0.1:9100")
     parser.add_argument("--concurrency", type=int, default=4, help="Number of concurrent workers.")
     parser.add_argument("--requests", type=int, default=20, help="Total measured requests. Ignored when --duration is set.")
     parser.add_argument("--duration", type=float, default=0.0, help="Measured duration in seconds. Overrides --requests.")
@@ -70,7 +76,7 @@ def main() -> int:
         parser.error("--requests must be positive when --duration is not set")
 
     questions = load_questions(args)
-    base_url = (args.url or default_url(args.target)).rstrip("/")
+    base_url = (args.url or default_url(args.target, args.pipeline_mode)).rstrip("/")
     token = (
         login_backend(base_url, args.username, args.password, args.timeout)
         if args.target == "backend" and args.scenario == "query"
@@ -83,6 +89,8 @@ def main() -> int:
         failed = sum(1 for item in warmup_samples if not item.ok)
         if failed:
             print(f"Warmup failures: {failed}/{len(warmup_samples)}", flush=True)
+            for item in sample_errors(warmup_samples):
+                print(f"  warmup_error status={item['status']} error={item['error']}", flush=True)
 
     print(
         f"Load test: target={args.target} url={base_url} concurrency={args.concurrency} "
@@ -122,8 +130,10 @@ def load_questions(args: argparse.Namespace) -> list[str]:
     return [item.strip() for item in questions if item.strip()] or list(DEFAULT_QUESTIONS)
 
 
-def default_url(target: str) -> str:
-    return "http://localhost:8080" if target == "backend" else "http://localhost:9000"
+def default_url(target: str, pipeline_mode: str = "real") -> str:
+    if target == "backend":
+        return "http://localhost:8080"
+    return "http://127.0.0.1:9100" if pipeline_mode == "mock" else "http://localhost:9000"
 
 
 def login_backend(base_url: str, username: str, password: str, timeout: float) -> str:
@@ -218,6 +228,7 @@ def send_query(args: argparse.Namespace, base_url: str, token: str, question: st
             "question": question,
             "top_k": args.top_k,
             "session_id": f"load-{int(time.time())}-{index}",
+            "pipeline_mode": args.pipeline_mode,
         }
         headers = {"Authorization": f"Bearer {token}"}
     else:
@@ -225,6 +236,7 @@ def send_query(args: argparse.Namespace, base_url: str, token: str, question: st
         payload = {
             "user_id": args.user_id,
             "top_k": args.top_k,
+            "pipeline_mode": args.pipeline_mode,
             "messages": [{"role": "user", "content": question}],
         }
         headers = {}
@@ -272,6 +284,7 @@ def build_report(args: argparse.Namespace, base_url: str, samples: list[Sample],
     return {
         "target": args.target,
         "scenario": args.scenario,
+        "pipeline_mode": args.pipeline_mode,
         "url": base_url,
         "concurrency": args.concurrency,
         "requests": len(samples),
@@ -320,6 +333,7 @@ def print_report(report: dict[str, Any]) -> None:
     print("\n=== QPS Benchmark ===")
     print(f"target:       {report['target']}")
     print(f"scenario:     {report['scenario']}")
+    print(f"pipeline:     {report['pipeline_mode']}")
     print(f"requests:     {report['requests']} success={report['successes']} errors={report['errors']}")
     print(f"elapsed:      {report['elapsed_seconds']:.2f}s")
     print(f"qps:          {report['qps']:.2f} successful req/s")
