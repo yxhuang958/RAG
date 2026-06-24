@@ -53,6 +53,7 @@ require_command() {
 
 require_command npm
 require_command go
+require_command python
 
 if [[ -x "$ROOT_DIR/pipeline/.venv/bin/uvicorn" ]]; then
     UVICORN_CMD=("$ROOT_DIR/pipeline/.venv/bin/uvicorn")
@@ -64,8 +65,11 @@ fi
 start_service "pipeline" "$ROOT_DIR/pipeline" "$LOG_DIR/pipeline.log" \
     "${UVICORN_CMD[@]}" app.main:app --host 0.0.0.0 --port "${PIPELINE_PORT:-9000}"
 
+start_service "mock-pipe" "$ROOT_DIR" "$LOG_DIR/mock-pipeline.log" \
+    python tests/load/mock_pipeline.py --host 127.0.0.1 --port "${MOCK_PIPELINE_PORT:-9100}" --quiet
+
 start_service "server" "$ROOT_DIR/server" "$LOG_DIR/server.log" \
-    go run main.go
+    env ENABLE_MOCK_PIPELINE=true MOCK_PIPELINE_URL="http://127.0.0.1:${MOCK_PIPELINE_PORT:-9100}" go run main.go
 
 start_service "client" "$ROOT_DIR/client" "$LOG_DIR/client.log" \
     npm run dev -- --host 0.0.0.0
@@ -74,6 +78,7 @@ printf '\nAll services started.\n'
 printf 'Frontend: http://localhost:5173\n'
 printf 'Backend:  http://localhost:%s\n' "${SERVER_PORT:-8080}"
 printf 'Pipeline: http://localhost:%s\n' "${PIPELINE_PORT:-9000}"
+printf 'MockPipe: http://127.0.0.1:%s\n' "${MOCK_PIPELINE_PORT:-9100}"
 printf 'Logs:     %s\n' "$LOG_DIR"
 printf 'Press Ctrl+C to stop everything.\n\n'
 

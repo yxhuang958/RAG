@@ -106,7 +106,7 @@ class QAPipeline:
 def _log_timing(stage: str, start: float, extra: str = "") -> None:
     elapsed_ms = (time.perf_counter() - start) * 1000
     suffix = f" {extra}" if extra else ""
-    print(f"TIMING query {stage}={elapsed_ms:.2f}ms{suffix}", flush=True)
+    # print(f"TIMING query {stage}={elapsed_ms:.2f}ms{suffix}", flush=True)
 
 
 def _finalize_contexts(contexts: list[dict], limit: int, max_per_doc: int = 3) -> list[dict]:

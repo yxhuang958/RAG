@@ -1,0 +1,26 @@
+{
+  "target": "backend",
+  "scenario": "query",
+  "url": "http://localhost:8080",
+  "concurrency": 32,
+  "requests": 207,
+  "successes": 207,
+  "errors": 0,
+  "error_rate": 0.0,
+  "elapsed_seconds": 33.43690966500435,
+  "qps": 6.190763502784164,
+  "throughput_rps": 6.190763502784164,
+  "latency_ms": {
+    "min": 1830.3550439886749,
+    "avg": 4961.2124799903995,
+    "p50": 5301.933724011178,
+    "p90": 6740.7506042014575,
+    "p95": 6898.047063904232,
+    "p99": 7257.599037423497,
+    "max": 7480.3781819937285
+  },
+  "status_counts": {
+    "200": 207
+  },
+  "sample_errors": []
+}

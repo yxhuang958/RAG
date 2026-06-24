@@ -23,11 +23,11 @@ const formatContextLabel = (ctx, index) => {
 function App() {
     const [username, setUsername] = useState('demo');
     const [password, setPassword] = useState('demo');
-    const [token, setToken] = useState(() => localStorage.getItem('rag_token') || '');
-    const [userId, setUserId] = useState(() => localStorage.getItem('rag_user_id') || '');
+    const [token, setToken] = useState('');
+    const [userId, setUserId] = useState('');
     const [loginStatus, setLoginStatus] = useState(token ? 'Signed in' : 'Please sign in');
     const [sessions, setSessions] = useState([]);
-    const [sessionId, setSessionId] = useState(() => localStorage.getItem('rag_session_id') || '');
+    const [sessionId, setSessionId] = useState('');
     const [selectedFile, setSelectedFile] = useState(null);
     const [uploadStatus, setUploadStatus] = useState('Ready for ingestion...');
     const [isUploading, setIsUploading] = useState(false);
@@ -131,8 +131,6 @@ function App() {
 
             setToken(result.token);
             setUserId(result.user_id);
-            localStorage.setItem('rag_token', result.token);
-            localStorage.setItem('rag_user_id', result.user_id);
             setSessions(result.sessions || []);
             setLoginStatus(`Signed in as ${result.user_id}`);
         } catch (error) {
@@ -263,7 +261,6 @@ function App() {
 
             if (result.session_id) {
                 setSessionId(result.session_id);
-                localStorage.setItem('rag_session_id', result.session_id);
             }
 
             setAnswer(result.answer || 'No answer returned.');
@@ -289,7 +286,6 @@ function App() {
 
     const selectSession = (session) => {
         setSessionId(session.session_id);
-        localStorage.setItem('rag_session_id', session.session_id);
         setHistory(session.messages || []);
         const lastAnswer = [...(session.messages || [])].reverse().find((item) => item.role === 'assistant');
         setAnswer(lastAnswer?.content || '');
@@ -297,7 +293,6 @@ function App() {
 
     const startNewSession = () => {
         setSessionId('');
-        localStorage.removeItem('rag_session_id');
         setHistory([]);
         setAnswer('');
         setContexts([]);

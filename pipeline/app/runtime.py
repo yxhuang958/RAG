@@ -48,7 +48,7 @@ def warmup(user_id: str) -> dict:
     get_collection(settings.embedding_dim)
     get_pipeline(user_id)
     elapsed_ms = (time.perf_counter() - total_start) * 1000
-    print(f"TIMING warmup total={elapsed_ms:.2f}ms user_id={user_id}", flush=True)
+    # print(f"TIMING warmup total={elapsed_ms:.2f}ms user_id={user_id}", flush=True)
     return {
         "status": "ok",
         "user_id": user_id,
@@ -60,4 +60,4 @@ def warmup(user_id: str) -> dict:
 def _log_warmup_timing(stage: str, start: float, extra: str = "") -> None:
     elapsed_ms = (time.perf_counter() - start) * 1000
     suffix = f" {extra}" if extra else ""
-    print(f"TIMING warmup {stage}={elapsed_ms:.2f}ms{suffix}", flush=True)
+    # print(f"TIMING warmup {stage}={elapsed_ms:.2f}ms{suffix}", flush=True)

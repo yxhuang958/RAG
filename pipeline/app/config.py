@@ -8,6 +8,7 @@ from dotenv import load_dotenv
 _PIPELINE_ROOT = Path(__file__).resolve().parents[1]
 _REPO_ROOT = Path(__file__).resolve().parents[2]
 load_dotenv(_PIPELINE_ROOT / ".env")
+load_dotenv(_REPO_ROOT / ".env")
 _VECTOR_METRICS = {"L2", "COSINE", "IP"}
 
 def _get_bool(value: str | None, default: bool = False) -> bool:
@@ -58,8 +59,13 @@ class Settings:
     milvus_collection: str = os.getenv("MILVUS_COLLECTION", "rag_documents")
 
     # MongoDB Configuration
-    mongo_uri: str = os.getenv("MONGO_URI", "mongodb://localhost:27017")
-    mongo_db: str = os.getenv("MONGO_DB", "rag_db")
+    mongo_uri: str = os.getenv("MONGODB_URI") or os.getenv("MONGO_URI", "mongodb://localhost:27017")
+    mongo_db: str = os.getenv("MONGODB_DATABASE") or os.getenv("MONGO_DB", "rag_db")
+    mongo_documents_collection: str = os.getenv("MONGODB_DOCUMENTS_COLLECTION", "pipeline_documents")
+    mongo_chunks_collection: str = os.getenv("MONGODB_CHUNKS_COLLECTION", "pipeline_chunks")
+    mongo_timeout_ms: int = _get_int("MONGODB_TIMEOUT_MS", 5000)
+    mongo_server_selection_timeout_ms: int = _get_int("MONGODB_SERVER_SELECTION_TIMEOUT_MS", 5000)
+    mongo_max_pool_size: int = _get_int("MONGODB_MAX_POOL_SIZE", 100)
 
     embedding_provider: str = os.getenv("EMBEDDING_PROVIDER", "local-st") # 修改默认为 local-st
     embedding_endpoint: str | None = os.getenv("EMBEDDING_ENDPOINT")
@@ -119,6 +125,7 @@ class Settings:
         "DOCUMENT_STORE_PATH",
         str(_REPO_ROOT / "server" / "data" / "pipeline_documents.json"),
     )
+    document_store_backend: str = os.getenv("DOCUMENT_STORE_BACKEND") or os.getenv("CHAT_STORE_BACKEND", "json")
     debug: bool = _get_bool(os.getenv("DEBUG"), False)
     
     retrieve_top_k: int = _get_int("RETRIEVE_TOPK", 30)

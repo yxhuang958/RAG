@@ -1,6 +1,9 @@
 package router
 
 import (
+	"os"
+	"strings"
+
 	"github.com/gin-gonic/gin"
 	"rag-server/internal/handlers"
 	"rag-server/internal/middleware"
@@ -8,7 +11,11 @@ import (
 
 // Setup 设置路由
 func Setup() *gin.Engine {
-	router := gin.Default()
+	router := gin.New()
+	router.Use(gin.Recovery())
+	if accessLogsEnabled() {
+		router.Use(gin.Logger())
+	}
 
 	// 应用中间件
 	router.Use(middleware.CORS())
@@ -33,4 +40,9 @@ func Setup() *gin.Engine {
 	}
 
 	return router
+}
+
+func accessLogsEnabled() bool {
+	value := strings.TrimSpace(strings.ToLower(os.Getenv("ACCESS_LOGS")))
+	return value == "1" || value == "true" || value == "yes" || value == "on"
 }

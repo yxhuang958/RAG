@@ -3,6 +3,7 @@ package handlers
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"net/http"
 	"strconv"
 	"strings"
@@ -40,6 +41,15 @@ func Login(c *gin.Context) {
 	}
 
 	userID := "user_" + username
+	isNewUser, err := chatStore.AuthenticateOrRegister(userID, username, payload.Password)
+	if err != nil {
+		if errors.Is(err, chat.ErrInvalidCredentials) {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid username or password"})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to authenticate user"})
+		return
+	}
 	token, err := auth.Sign(userID, username, jwtSecret(), 24*time.Hour)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to create token"})
@@ -55,6 +65,7 @@ func Login(c *gin.Context) {
 		"token":    token,
 		"user_id":  userID,
 		"username": username,
+		"is_new":   isNewUser,
 		"sessions": chatStore.ListSessions(userID),
 	})
 }

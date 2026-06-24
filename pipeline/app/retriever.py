@@ -246,4 +246,4 @@ def _bm25_score(
 def _log_timing(stage: str, start: float, extra: str = "") -> None:
     elapsed_ms = (time.perf_counter() - start) * 1000
     suffix = f" {extra}" if extra else ""
-    print(f"TIMING query {stage}={elapsed_ms:.2f}ms{suffix}", flush=True)
+    # print(f"TIMING query {stage}={elapsed_ms:.2f}ms{suffix}", flush=True)

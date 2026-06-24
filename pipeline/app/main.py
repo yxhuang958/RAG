@@ -268,4 +268,4 @@ def _normalize_user_id(user_id: str | None) -> str:
 def _log_query_timing(stage: str, start: float, extra: str = "") -> None:
     elapsed_ms = (time.perf_counter() - start) * 1000
     suffix = f" {extra}" if extra else ""
-    print(f"TIMING query {stage}={elapsed_ms:.2f}ms{suffix}", flush=True)
+    # print(f"TIMING query {stage}={elapsed_ms:.2f}ms{suffix}", flush=True)
