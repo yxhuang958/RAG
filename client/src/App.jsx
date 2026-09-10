@@ -151,7 +151,7 @@ function App() {
         setLoginStatus('Signed out');
     };
 
-    const refreshSessions = async () => {
+    const refreshSessions = async (activeSessionId = sessionId) => {
         try {
             const response = await fetch(`${apiBaseUrl}/api/sessions`, {
                 headers: authHeaders
@@ -159,7 +159,7 @@ function App() {
             const result = await response.json();
             if (response.ok) {
                 setSessions(result.sessions || []);
-                const active = result.sessions?.find((item) => item.session_id === sessionId);
+                const active = result.sessions?.find((item) => item.session_id === activeSessionId);
                 if (active) {
                     setHistory(active.messages || []);
                 }
@@ -259,14 +259,45 @@ function App() {
                 return;
             }
 
+            const resolvedSessionId = result.session_id || sessionId;
+            const resolvedAnswer = result.answer || 'No answer returned.';
+
             if (result.session_id) {
                 setSessionId(result.session_id);
             }
 
-            setAnswer(result.answer || 'No answer returned.');
+            setAnswer(resolvedAnswer);
             setContexts(result.contexts || []);
-            setHistory(result.history || []);
-            refreshSessions();
+
+            // The query response already contains the authoritative history.
+            // Update both views from it instead of immediately re-reading
+            // MongoDB, whose asynchronous write may still be pending.
+            const nextHistory = Array.isArray(result.history) && result.history.length > 0
+                ? result.history
+                : [
+                    ...history,
+                    optimisticUserMessage,
+                    {
+                        role: 'assistant',
+                        content: resolvedAnswer,
+                        created_at: Date.now()
+                    }
+                ];
+
+            setHistory(nextHistory);
+            setSessions((current) => {
+                const existing = current.find((item) => item.session_id === resolvedSessionId);
+                const updated = {
+                    ...(existing || {}),
+                    session_id: resolvedSessionId,
+                    messages: nextHistory,
+                    updated_at: Date.now()
+                };
+                return [
+                    updated,
+                    ...current.filter((item) => item.session_id !== resolvedSessionId)
+                ];
+            });
         } catch (error) {
             setAnswer('Query failed. Please try again.');
             setQuestion(submittedQuestion);

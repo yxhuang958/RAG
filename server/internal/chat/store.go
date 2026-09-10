@@ -110,8 +110,14 @@ func (s *Store) LoadUser(userID string) error {
 		}
 		s.mu.Lock()
 		defer s.mu.Unlock()
-		for id, session := range sessions {
-			s.sessions[id] = session
+		for id, persisted := range sessions {
+			current, exists := s.sessions[id]
+			// Persistence is asynchronous. A sessions request can therefore read
+			// an older MongoDB snapshot immediately after AppendExchange. Never
+			// let that stale snapshot replace newer in-memory conversation state.
+			if !exists || persisted.UpdatedAt > current.UpdatedAt {
+				s.sessions[id] = persisted
+			}
 		}
 		return nil
 	}
